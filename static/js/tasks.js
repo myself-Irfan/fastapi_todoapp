@@ -75,10 +75,45 @@ document.addEventListener('DOMContentLoaded', () => {
                     <a href="/tasks/${task.id}/edit" class="btn btn-sm btn-outline-warning">
                         <i class="bi bi-pencil"></i>
                     </a>
+                    <button class="btn btn-sm btn-outline-danger btn-delete-task" data-id="${task.id}" title="Delete">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </div>
             `;
             row.appendChild(actionsTd);
             taskList.appendChild(row);
+        });
+
+        attachDeleteHandlers();
+    }
+
+    function attachDeleteHandlers() {
+        const deleteButtons = document.querySelectorAll('.btn-delete-task');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', async () => {
+                const taskId = button.getAttribute('data-id');
+                if (!taskId) return;
+
+                const confirmed = confirm('Are you sure you wish to delete this task?');
+                if (!confirmed) return;
+
+                try {
+                    const res = await fetch(`/api/tasks/${taskId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!res.ok) {
+                        const data = await res.json();
+                        throw new Error(data.detail || 'Failed to delete task');
+                    }
+
+                    allTasks = allTasks.filter(task => task.id != taskId);
+                    applyFilters();
+                } catch (err) {
+                    console.error('Delete error:', err);
+                    alert(err.message || 'Error deleting task');
+                }
+            });
         });
     }
 
