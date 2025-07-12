@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}All Tasks{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">All Tasks</h2>
+        </div>
+
+        <!-- Search -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" class="form-control" placeholder="Search tasks..." id="search-input">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="status-filter">
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tasks Table -->
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0" id="task-table">
+                    <thead class="table-dark" style="background-color: #6f42c1;">
+                    <tr>
+                        <th>Title</th>
+                        <th class="d-none d-md-table-cell">Description</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th width="120">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="task-list">
+                    <!-- Tasks will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="text-center py-4 d-none">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error-message" class="alert alert-danger mt-3 d-none" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span id="error-text"></span>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="text-center py-5 d-none">
+            <i class="bi bi-inbox display-4 text-muted mb-3"></i>
+            <h4 class="text-muted">No tasks found</h4>
+            <p class="text-muted">Create your first task to get started</p>
+            <a href="/create" class="btn btn-primary">Create Task</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block customjs %}
+    <script src="/static/js/tasks.js"></script>
+{% endblock %}
