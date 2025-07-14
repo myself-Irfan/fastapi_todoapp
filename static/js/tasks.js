@@ -69,10 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const actionsTd = document.createElement('td');
             actionsTd.innerHTML = `
                 <div class="d-flex gap-2">
-                    <a href="/tasks/${task.id}" class="btn btn-sm btn-outline-primary">
+                    <a href="/${task.id}" class="btn btn-sm btn-outline-primary">
                         <i class="bi bi-eye"></i>
                     </a>
-                    <a href="/tasks/${task.id}/edit" class="btn btn-sm btn-outline-warning">
+                    <a href="/edit/${task.id}" class="btn btn-sm btn-outline-warning">
                         <i class="bi bi-pencil"></i>
                     </a>
                     <button class="btn btn-sm btn-outline-danger btn-delete-task" data-id="${task.id}" title="Delete">

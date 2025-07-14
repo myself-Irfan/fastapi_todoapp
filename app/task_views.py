@@ -29,3 +29,12 @@ async def render_create(request: Request):
     :return:
     """
     return templates.TemplateResponse('create.html', {'request': request})
+
+@router.get('/edit', response_class=HTMLResponse)
+async def render_edit(request: Request):
+    """
+    render edit task page
+    :param request:
+    :return:
+    """
+    return templates.TemplateResponse('edit.html', {'request': request})
