@@ -3,8 +3,8 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-8">
-        <div class="card shadow-sm">
-            <div class="card-header text-white bg-primary">
+        <div class="card p-0 shadow-sm bg-dark text-white">
+            <div class="card-header text-white" style="background-color: #6f42c1;">
                 <h5 class="mb-0">
                     <i class="bi bi-info-circle me-2"></i>
                     Task Details
@@ -18,7 +18,7 @@
                 </div>
                 <div id="task-container" class="d-none">
                     <h4 id="task-title"></h4>
-                    <p id="task-description" class="text-muted"></p>
+                    <p id="task-description"></p>
                     <p><strong>Status:</strong> <span id="task-status"></span></p>
                     <p><strong>Due Date:</strong> <span id="task-due-date"></span></p>
                     <p><strong>Created At:</strong> <span id="task-created-at"></span></p>

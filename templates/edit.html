@@ -8,7 +8,7 @@
     </div>
 
     <!-- Edit form card -->
-    <div class="card">
+    <div class="card p-0 bg-dark text-white">
         <div class="card-header text-white" style="background-color: #6f42c1;">
             <h5 class="card-title mb-0">
                 <i class="bi bi-pencil-square me-2"></i>
@@ -29,7 +29,7 @@
                            placeholder="Enter task title"
                            aria-describedby="title-help title-feedback"
                     >
-                    <div id="title-help" class="form-text">Title must be between 3 and 200 characters</div>
+                    <div id="title-help" class="form-text text-warning">Title must be between 3 and 200 characters</div>
                     <div id="title-feedback" class="invalid-feedback"></div>
                 </div>
 
@@ -43,7 +43,7 @@
                               maxlength="1000"
                               placeholder="Enter task description (optional)"
                               aria-describedby="description-help"></textarea>
-                    <div id="description-help" class="form-text">Optional. Maximum 1000 characters</div>
+                    <div id="description-help" class="form-text text-warning">Optional. Maximum 1000 characters</div>
                 </div>
 
                 <!-- due date -->
@@ -53,7 +53,7 @@
                            id="due_date"
                            name="due_date"
                            class="form-control">
-                    <div class="form-text">Optional. Leave blank for no due date</div>
+                    <div class="form-text text-warning">Optional. Leave blank for no due date</div>
                 </div>
 
                 <!-- complete checkbox -->
@@ -65,7 +65,7 @@
                                name="is_complete"
                                class="form-check-input"
                                aria-describedby="status-help">
-                        <div id="status-help" class="form-text">Check this if task is complete</div>
+                        <div id="status-help" class="form-text text-warning">Check this if task is complete</div>
                     </div>
                 </div>
 

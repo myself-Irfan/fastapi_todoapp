@@ -61,6 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
             statusTd.className = task.is_complete ? 'text-success' : 'text-warning';
             row.appendChild(statusTd);
 
+            const dueDateTd = document.createElement('td');
+            dueDateTd.classList.add('d-none', 'd-md-table-cell');
+            dueDateTd.textContent = formatDateWithOrdinal(task.due_date);
+            row.appendChild(dueDateTd);
+
             const createTimeTd = document.createElement('td');
             createTimeTd.classList.add('d-none', 'd-md-table-cell');
             createTimeTd.textContent = task.created_at;
@@ -147,6 +152,28 @@ document.addEventListener('DOMContentLoaded', () => {
         errorText.textContent = '';
         emptyState.classList.add('d-none');
         taskTable.classList.remove('d-none');
+    }
+
+    function formatDateWithOrdinal(dateStr) {
+        const dateObj = new Date(dateStr);
+        if (isNaN(dateObj)) return '-';
+
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        let formatted = dateObj.toLocaleDateString('en-US', options);
+
+        const day = dateObj.getDate();
+        const suffix = (n) => {
+            if (n >= 11 & n <= 13) return 'th';
+            switch(n%10) {
+                case 1: return 'st';
+                case 2: return 'nd';
+                case 3: return 'rd';
+                default: return 'th';
+            }
+        };
+
+        formatted = formatted.replace(/\d+/, match => `${match}${suffix(day)}`);
+        return formatted;
     }
 
     // connect filters
