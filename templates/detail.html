@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Task Details{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header text-white bg-primary">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Task Details
+                </h5>
+            </div>
+            <div class="card-body" id="task-detail-content">
+                <div id="loading" class="text-center py-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div id="task-container" class="d-none">
+                    <h4 id="task-title"></h4>
+                    <p id="task-description" class="text-muted"></p>
+                    <p><strong>Status:</strong> <span id="task-status"></span></p>
+                    <p><strong>Due Date:</strong> <span id="task-due-date"></span></p>
+                    <p><strong>Created At:</strong> <span id="task-created-at"></span></p>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <a id="edit-button" class="btn btn-warning">
+                            <i class="bi bi-pencil me-1"></i> Edit
+                        </a>
+                        <button id="delete-button" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i> Delete
+                        </button>
+                    </div>
+                </div>
+                <div id="error-message" class="alert alert-danger d-none mt-3" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span id="error-text"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block customjs %}
+<script>
+    const TASK_ID = "{{ task_id }}";
+</script>
+<script src="/static/js/detail.js"></script>
+{% endblock %}

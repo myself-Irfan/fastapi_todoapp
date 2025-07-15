@@ -93,5 +93,8 @@
 {% endblock %}
 
 {% block customjs %}
+<script>
+    const TASK_ID = "{{ task_id }}";
+</script>
 <script src="/static/js/edit.js"></script>
 {% endblock %}

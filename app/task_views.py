@@ -21,6 +21,7 @@ async def render_index(request: Request):
     """
     return templates.TemplateResponse('index.html', {'request': request})
 
+
 @router.get('/create', response_class=HTMLResponse)
 async def render_create(request: Request):
     """
@@ -30,11 +31,23 @@ async def render_create(request: Request):
     """
     return templates.TemplateResponse('create.html', {'request': request})
 
-@router.get('/edit', response_class=HTMLResponse)
-async def render_edit(request: Request):
+
+@router.get('/edit/{task_id}', response_class=HTMLResponse)
+async def render_edit(request: Request, task_id: int):
     """
     render edit task page
     :param request:
     :return:
     """
-    return templates.TemplateResponse('edit.html', {'request': request})
+    return templates.TemplateResponse('edit.html', {
+        'request': request,
+        'task_id': task_id
+    })
+
+
+@router.get('/{task_id}', response_class=HTMLResponse)
+async def render_details(request: Request, task_id: int):
+    return templates.TemplateResponse('detail.html', {
+        'request': request,
+        'task_id': task_id
+    })

@@ -1,20 +1,23 @@
 document.addEventListener('DOMContentLoaded', ()=> {
     const form = document.getElementById('edit-form');
-    const submitButton = form.querySelector('button[type=submit');
+    const submitButton = form.querySelector('button[type=submit]');
     const originalButtonText = submitButton.textContent;
 
     const feedback = document.getElementById('feedback-message');
     const feedbackText = document.getElementById('feedback-text');
     const feedbackIcon = document.getElementById('feedback-icon');
 
-    const taskId = window.location.pathname.split('/')[1];
+    const taskId = TASK_ID;
 
     document.getElementById('due_date').min = new Date().toISOString().split('T')[0];
 
     async function fetchTask() {
         try {
             const res = await fetch(`/api/tasks/${taskId}`);
-            if (!res.ok) throw new Error('failed to fetch task data');
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.detail || 'Failed to fetch task data');
+            }
             const data = await res.json();
             populateForm(data.data);
         } catch (err) {
@@ -46,8 +49,8 @@ document.addEventListener('DOMContentLoaded', ()=> {
     function showFeedback(type, message) {
         feedback.className = `alert alert-${type} mt-3`;
         feedback.classList.remove('d-none');
-        feedback.textContent = message;
-        feedback.className = type === 'success' ? 'bi bi-check-circle-fill me-2' : 'bi bi-exclamation-triangle-fill me-2';
+        feedbackText.textContent = message;
+        feedbackIcon.className = type === 'success' ? 'bi bi-check-circle-fill me-2' : 'bi bi-exclamation-triangle-fill me-2';
     }
 
     function validateForm() {
@@ -58,7 +61,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
             return false;
         }
 
-        if (!title.length < 3 || title.length > 200) {
+        if (title.length < 3 || title.length > 200) {
             showFeedback('warning', 'Title must be between 3 and 200 characters');
             return false;
         }
@@ -78,11 +81,11 @@ document.addEventListener('DOMContentLoaded', ()=> {
             title: document.getElementById('title').value.trim(),
             description: document.getElementById('description').value.trim() || null,
             due_date: document.getElementById('due_date').value.trim() || null,
-            is_complete: document.getElementById('is_complete').check
+            is_complete: document.getElementById('is_complete').checked
         };
 
         try {
-            const res = await fetch(`/api/tasks/${task_id}`, {
+            const res = await fetch(`/api/tasks/${taskId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -97,7 +100,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
             showFeedback('success', 'task updated successfully.');
             setTimeout(() => {
-                window.location.href = `/tasks/`
+                window.location.href = '/'
             }, 1500);
         } catch (err) {
             showFeedback('danger', err.message);
