@@ -2,8 +2,8 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
 
-LOG_DIR = os.getenv('LOG_DIR')
-LOG_FILE = os.getenv('LOG_FILE')
+LOG_DIR = os.getenv('LOG_DIR', 'logs')
+LOG_FILE = os.getenv('LOG_FILE', 'app.log')
 os.makedirs(LOG_DIR, exist_ok=True)
 
 

@@ -4,8 +4,9 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.schemas import TaskCreate, TaskRead, TaskListResponse, TaskResponse, TaskUpdate, ApiResponse
 from app.database import get_db
-from app.models import Task
+from app.models import Task, User
 from app.logger import get_logger
+from app.auth import get_current_active_user
 
 router = APIRouter(
     prefix="/api/tasks",
@@ -27,7 +28,10 @@ logger = get_logger(__name__)
         500: {"description": "Internal server error"}
     }
 )
-async def get_all_tasks(db: Session = Depends(get_db)) -> TaskListResponse:
+async def get_all_tasks(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+) -> TaskListResponse:
     """
     Retrieve all tasks from the database.
     Args: db: SQLAlchemy database session
@@ -80,7 +84,11 @@ async def get_all_tasks(db: Session = Depends(get_db)) -> TaskListResponse:
         500: {'description': 'Internal server error'}
     }
 )
-async def get_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
+async def get_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+) -> TaskResponse:
     """
     Retrieve a specific task by its ID.
     Args: task_id: The ID of the task to retrieve, db: SQLAlchemy database session
@@ -135,7 +143,11 @@ async def get_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
         500: {'description': 'Internal server error'}
     }
 )
-async def create_task(payload: TaskCreate, db: Session = Depends(get_db)) -> ApiResponse:
+async def create_task(
+    payload: TaskCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+) -> ApiResponse:
     """
     Create a new task in the database.
     Args: payload: TaskCreate schema with task data, db: SQLAlchemy database session
@@ -182,7 +194,12 @@ async def create_task(payload: TaskCreate, db: Session = Depends(get_db)) -> Api
         500: {'description': 'Internal server error'}
     }
 )
-async def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(get_db)) -> TaskResponse:
+async def update_task(
+    task_id: int,
+    payload: TaskUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+) -> TaskResponse:
     """
     Update an existing task by its ID.
     Args: task_id: The ID of the task to update, payload: TaskUpdate schema with updated task data, db: SQLAlchemy database session
@@ -236,7 +253,11 @@ async def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(g
         500: {'description': 'Internal server error'}
     }
 )
-async def delete_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
+async def delete_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+) -> TaskResponse:
     """
     Delete a task by its ID.
     Args: task_id: The ID of the task to delete, db: SQLAlchemy database session
