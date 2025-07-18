@@ -2,9 +2,9 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
 
-LOG_DIR = os.getenv('LOG_DIR')
-LOG_FILE = os.getenv('LOG_FILE')
-os.makedirs(LOG_DIR, exist_ok=True)
+from app.config import settings
+
+os.makedirs(settings.log_dir, exist_ok=True)
 
 
 def get_logger(name: str = __name__) -> logging.Logger:
@@ -25,7 +25,7 @@ def get_logger(name: str = __name__) -> logging.Logger:
 
     # file logging
     file_handler = TimedRotatingFileHandler(
-        filename=os.path.join(LOG_DIR, LOG_FILE),
+        filename=f'{settings.log_dir}/{settings.log_file}',
         when='midnight',
         interval=1,
         backupCount=7,

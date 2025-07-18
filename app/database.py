@@ -1,15 +1,11 @@
-import os
-from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
-load_dotenv()
+from app.config import settings
 
-SQLALCHEMY_DB_URL = os.getenv('SQLALCHEMY_DB_URL')
 
 engine = create_engine(
-    SQLALCHEMY_DB_URL,
+    settings.db_url,
     connect_args={'check_same_thread': False}
 )
 SessionLocal = sessionmaker(
@@ -18,7 +14,8 @@ SessionLocal = sessionmaker(
     bind=engine
 )
 
-Base = declarative_base()
+class Base(DeclarativeBase):
+    pass
 
 def get_db():
     db = SessionLocal()

@@ -1,0 +1,31 @@
+from pydantic import BaseModel, EmailStr, Field
+from app.task_schemas import ApiResponse
+
+
+class UserRegister(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    email: EmailStr
+    password: str = Field(..., min_length=5)
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str = Field(..., min_length=5)
+
+
+class UserOut(BaseModel):
+    id: int
+    name: str = Field(..., min_length=1, max_length=100)
+    email: EmailStr
+
+    class Config:
+        orm_mode = True
+
+
+class TokenPair(BaseModel):
+    access_token: str
+    refresh_token: str
+
+
+class LoginResponse(ApiResponse):
+    data: TokenPair

@@ -2,14 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.schemas import TaskCreate, TaskRead, TaskListResponse, TaskResponse, TaskUpdate, ApiResponse
+from app.auth import get_cur_user
+from app.task_schemas import TaskCreate, TaskRead, TaskListResponse, TaskResponse, TaskUpdate, ApiResponse
 from app.database import get_db
 from app.models import Task
 from app.logger import get_logger
 
 router = APIRouter(
     prefix="/api/tasks",
-    tags=["Task APIs"]
+    tags=["Task APIs"],
+    dependencies=[Depends(get_cur_user)]
 )
 logger = get_logger(__name__)
 
@@ -27,7 +29,7 @@ logger = get_logger(__name__)
         500: {"description": "Internal server error"}
     }
 )
-async def get_all_tasks(db: Session = Depends(get_db)) -> TaskListResponse:
+def get_all_tasks(db: Session = Depends(get_db)) -> TaskListResponse:
     """
     Retrieve all tasks from the database.
     Args: db: SQLAlchemy database session
@@ -80,7 +82,7 @@ async def get_all_tasks(db: Session = Depends(get_db)) -> TaskListResponse:
         500: {'description': 'Internal server error'}
     }
 )
-async def get_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
+def get_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
     """
     Retrieve a specific task by its ID.
     Args: task_id: The ID of the task to retrieve, db: SQLAlchemy database session
@@ -135,7 +137,7 @@ async def get_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
         500: {'description': 'Internal server error'}
     }
 )
-async def create_task(payload: TaskCreate, db: Session = Depends(get_db)) -> ApiResponse:
+def create_task(payload: TaskCreate, db: Session = Depends(get_db)) -> ApiResponse:
     """
     Create a new task in the database.
     Args: payload: TaskCreate schema with task data, db: SQLAlchemy database session
@@ -158,14 +160,14 @@ async def create_task(payload: TaskCreate, db: Session = Depends(get_db)) -> Api
         logger.error(f'Database error: {err}', exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Database error during creation'
+            detail=f'Database error: {err}'
         ) from err
     except Exception as err:
         db.rollback()
         logger.error(f'Unexpected error: {err}', exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail='Unexpected error during creation'
+            detail=f'Unexpected error: {err}'
         ) from err
 
 @router.put(
@@ -182,7 +184,7 @@ async def create_task(payload: TaskCreate, db: Session = Depends(get_db)) -> Api
         500: {'description': 'Internal server error'}
     }
 )
-async def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(get_db)) -> TaskResponse:
+def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(get_db)) -> TaskResponse:
     """
     Update an existing task by its ID.
     Args: task_id: The ID of the task to update, payload: TaskUpdate schema with updated task data, db: SQLAlchemy database session
@@ -236,7 +238,7 @@ async def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(g
         500: {'description': 'Internal server error'}
     }
 )
-async def delete_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
+def delete_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
     """
     Delete a task by its ID.
     Args: task_id: The ID of the task to delete, db: SQLAlchemy database session
