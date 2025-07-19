@@ -14,7 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoading();
 
         try {
-            const res = await fetch('/api/tasks/');
+            const res = await fetch('/api/tasks/', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                }
+            });
             if (!res.ok) throw new Error('Failed to fetch tasks');
 
             const data = await res.json();
@@ -104,7 +108,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 try {
                     const res = await fetch(`/api/tasks/${taskId}`, {
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                        }
                     });
 
                     if (!res.ok) {

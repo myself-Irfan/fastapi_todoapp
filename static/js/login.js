@@ -35,21 +35,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     showAlert('danger', data.detail || 'Login failed');
                 }
             } else {
-                showAlert('success', 'Login successful!');
+                const tokens = data.data || {};
+
+                localStorage.setItem('access_token', tokens.access_token);
+                localStorage.setItem('refresh_token', tokens.refresh_token);
+
+                showAlert('success', 'Login successful! Redirecting...');
                 setTimeout(() => {
                     window.location.href = '/';
                 }, 1000);
             }
         } catch (err) {
-            const tokens = data.data || {};
-
-            localStorage.setItem('access_token', tokens.access_token);
-            localStorage.setItem('refresh_token', tokens.refresh_token);
-
-            showAlert('success', 'Login successful! Redirecting...');
-            setTimeout(() => {
-                window.location.href = '/';
-            }, 1000);
+            console.error('Login error:', err);
+            showAlert('danger', 'Something went wrong. Please try again later.');
         }
     });
 
