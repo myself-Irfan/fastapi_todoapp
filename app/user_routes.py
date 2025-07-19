@@ -18,6 +18,7 @@ logger = get_logger(__name__)
 @router.post(
     '/register',
     response_model=ApiResponse,
+    status_code=status.HTTP_201_CREATED,
     summary='Register an user',
     description='Take name, email and password to register an user',
     responses={

@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.task_routes import router as task_api_router
 from app.user_routes import router as user_api_router
+from app.user_views import router as user_view_router
 from app.task_views import router as task_view_router
 from app.database import engine, Base
 from fastapi.staticfiles import StaticFiles
@@ -16,6 +17,7 @@ app.mount('/static', StaticFiles(directory='static'), name='static')
 
 Base.metadata.create_all(bind=engine)
 app.include_router(user_api_router)
+app.include_router(user_view_router)
 app.include_router(task_api_router)
 app.include_router(task_view_router)
 

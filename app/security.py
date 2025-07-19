@@ -61,7 +61,7 @@ def verify_pwd(pwd_hashed: str, pwd_str: str) -> tuple[bool, bool]:
     return False, False
 
 
-def _create_token(data: dict, expires_delta: timedelta, token_type: str) -> str:
+def _create_token(user_id: int, expires_delta: timedelta, token_type: str) -> str:
     """
     Create a JWT token
     :param data: Data to encode in token
@@ -71,22 +71,22 @@ def _create_token(data: dict, expires_delta: timedelta, token_type: str) -> str:
     :raises AuthError: If token creation fails
     """
 
-    if not data or not isinstance(data, dict):
-        raise ValueError('Data must be a non-empty dictionary')
+    if user_id <= 0:
+        raise ValueError(f'Invalid user_id: {user_id}')
 
     if token_type not in ['access', 'refresh']:
         raise ValueError('Token type must be access or refresh')
 
     try:
-        to_encode = data.copy()
-        expire = datetime.now(timezone.utc) + expires_delta
-        to_encode.update({
-            'exp': expire,
-            'iat': datetime.now(timezone.utc),
-            'type': token_type
-        })
+        now = datetime.now(timezone.utc)
+        payload = {
+            'sub': str(user_id),
+            'type': token_type,
+            'iat': now,
+            'exp': now + expires_delta
+        }
         return jwt.encode(
-            to_encode,
+            payload,
             settings.secret_key,
             algorithm=settings.algorithm
         )
@@ -103,21 +103,16 @@ def gen_user_tokens(user_id: int) -> tuple[str, str]:
     :raises ValueError: If user_id is invalid
     :raises AuthError: If token generation fails
     """
-    if not isinstance(user_id, int) or user_id <= 0:
-        raise ValueError('User ID must be a positive integer')
-
-    payload = {'sub': str(user_id)}
-
     logger.info(f'Creating access token')
     access_token = _create_token(
-        data=payload,
+        user_id=user_id,
         expires_delta=timedelta(minutes=settings.access_token_expire_minutes),
         token_type='access'
     )
 
     logger.info(f'Creating refresh token')
     refresh_token = _create_token(
-        data=payload,
+        user_id=user_id,
         expires_delta=timedelta(days=settings.refresh_token_expire_days),
         token_type='refresh'
     )
@@ -188,7 +183,7 @@ def get_user_from_token(token: str, token_type: str = 'access') -> int | None:
         user_id = int(user_id_str)
         if user_id <= 0:
             logger.warning('Invalid user_id in token')
-            return None
+            raise ValueError
 
         return user_id
     except (ValueError, TypeError) as err:

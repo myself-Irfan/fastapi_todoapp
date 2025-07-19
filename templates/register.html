@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Register User{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2 class="mb-4 text-center">Register</h2>
+        <div id="alert-placeholder"></div>
+        <form id="registerForm" novalidate>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+                <input type="text"
+                       id="name"
+                       name="name"
+                       class="form-control"
+                       required
+                       maxlength="100"
+                       placeholder="Enter your name"
+                >
+                <div class="invalid-feedback"></div>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email address <span class="text-danger">*</span></label>
+                <input type="email"
+                       id="email"
+                       name="email"
+                       class="form-control"
+                       required
+                       placeholder="Enter your email address"
+                >
+                <div class="invalid-feedback"></div>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                <input type="password"
+                       id="password"
+                       name="password"
+                       class="form-control"
+                       required
+                       minlength="5"
+                       placeholder="Enter your password"
+                >
+                <div class="invalid-feedback"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Register</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block customjs %}
+<script src="/static/js/register.js"></script>
+{% endblock %}

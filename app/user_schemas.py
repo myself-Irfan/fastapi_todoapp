@@ -3,7 +3,7 @@ from app.task_schemas import ApiResponse
 
 
 class UserRegister(BaseModel):
-    name: str = Field(..., min_length=1, max_length=100)
+    name: str = Field(..., min_length=3, max_length=100, description='User name')
     email: EmailStr
     password: str = Field(..., min_length=5)
 
