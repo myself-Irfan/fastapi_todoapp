@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2 class="text-center">Login</h2>
+        <div id="alert-placeholder"></div>
+        <form id="loginForm">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email address <span class="text-danger">*</span></label>
+                <input type="email"
+                       id="email"
+                       name="email"
+                       class="form-control"
+                       required
+                       placeholder="Enter your email address"
+                >
+                <div class="invalid-feedback"></div>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                <input type="password"
+                       id="password"
+                       name="password"
+                       class="form-control"
+                       required
+                       minlength="5"
+                       placeholder="Enter your password"
+                >
+                <div class="invalid-feedback"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block customjs %}
+<script src="/static/js/login.js"></script>
+{% endblock %}

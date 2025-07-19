@@ -20,3 +20,13 @@ def render_register(request: Request):
     :return:
     """
     return templates.TemplateResponse('register.html', {'request': request})
+
+
+@router.get('/login', response_class=HTMLResponse)
+def login_user(request: Request):
+    """
+    render user login page
+    :param request:
+    :return:
+    """
+    return templates.TemplateResponse('login.html', {'request': request})
