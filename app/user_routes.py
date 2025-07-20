@@ -1,12 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Header
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.user_schemas import UserRegister, UserLogin, UserOut, ApiResponse, LoginResponse, TokenPair
+from app.auth import refresh_access_token
+from app.user_schemas import UserRegister, UserLogin, UserOut, ApiResponse, LoginResponse, RefreshTokenResponse, \
+    LoginTokenData, RefreshTokenData
 from app.database import get_db
 from app.models import User
 from app.logger import get_logger
-from app.security import hash_pwd, verify_pwd, gen_user_tokens
+from app.security import hash_pwd, verify_pwd, gen_access_token, gen_refresh_token
 
 router = APIRouter(
     prefix='/api/users',
@@ -115,11 +117,12 @@ def login_user(user_data: UserLogin, db: Session = Depends(get_db)) -> LoginResp
             finally:
                 db.close()
 
-        access_token, refresh_token = gen_user_tokens(user.id)
+        access_token = gen_access_token(user.id)
+        refresh_token = gen_refresh_token(user.id)
 
         return LoginResponse(
             message='Login successful',
-            data=TokenPair(
+            data=LoginTokenData(
                 access_token=access_token,
                 refresh_token=refresh_token
             )
@@ -133,3 +136,35 @@ def login_user(user_data: UserLogin, db: Session = Depends(get_db)) -> LoginResp
             detail='An unexpected error occurred'
         ) from err
 
+
+@router.post(
+    '/refresh-token',
+    response_model=RefreshTokenResponse,
+    summary='Refresh access token',
+    description="Refresh an user's access token",
+    responses={
+        200: {
+            'description': "User access token refreshed",
+            'model': RefreshTokenResponse
+        },
+        400: {'description': "Invalid refresh token"},
+        500: {'description': "Internal server error"}
+    }
+)
+def refresh_user_access_token(authorization: str = Header(..., alias='Authorization'), db: Session = Depends(get_db)) -> RefreshTokenResponse:
+    if not authorization.startswith('Bearer'):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Invalid Authorization header format'
+        )
+
+    refresh_token = authorization.removeprefix('Bearer').strip()
+
+    new_access_token = refresh_access_token(refresh_token, db)
+
+    return RefreshTokenResponse(
+        message='Access token refreshed',
+        data=RefreshTokenData(
+            access_token=new_access_token
+        )
+    )

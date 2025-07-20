@@ -22,10 +22,17 @@ class UserOut(BaseModel):
         orm_mode = True
 
 
-class TokenPair(BaseModel):
+class LoginTokenData(BaseModel):
     access_token: str
     refresh_token: str
 
-
 class LoginResponse(ApiResponse):
-    data: TokenPair
+    data: LoginTokenData
+
+
+class RefreshTokenData(BaseModel):
+    access_token: str
+
+class RefreshTokenResponse(ApiResponse):
+    data: RefreshTokenData
+

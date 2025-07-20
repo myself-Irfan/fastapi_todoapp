@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import User
-from app.security import get_user_from_token, gen_user_tokens
+from app.security import get_user_from_token, gen_access_token
 from app.logger import get_logger
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/users/login')
@@ -63,7 +63,7 @@ def get_cur_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_
         ) from err
 
 
-def refresh_access_token(refresh_token: str, db: Session) -> Tuple[str, str]:
+def refresh_access_token(refresh_token: str, db: Session) -> str:
     """
     Generate new access token from refresh token
     :param refresh_token: Valid refresh token
@@ -87,4 +87,4 @@ def refresh_access_token(refresh_token: str, db: Session) -> Tuple[str, str]:
             detail='User not found'
         )
 
-    return gen_user_tokens(user_id)
+    return gen_access_token(user_id)

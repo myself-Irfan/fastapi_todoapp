@@ -95,29 +95,33 @@ def _create_token(user_id: int, expires_delta: timedelta, token_type: str) -> st
         raise RuntimeError(f'Failed to create {token_type} token: {err}') from err
 
 
-def gen_user_tokens(user_id: int) -> tuple[str, str]:
+def gen_access_token(user_id: int) -> str:
     """
-    Generate access and refresh tokens for user
-    :param user_id: User ID
-    :return: (access_token, refresh_token)
-    :raises ValueError: If user_id is invalid
-    :raises AuthError: If token generation fails
+    generate access token
+    :param user_id: int
+    :return: access_token -> str
     """
     logger.info(f'Creating access token')
-    access_token = _create_token(
+    return _create_token(
         user_id=user_id,
         expires_delta=timedelta(minutes=settings.access_token_expire_minutes),
         token_type='access'
     )
 
+
+def gen_refresh_token(user_id: int) -> str:
+    """
+    generate refresh token
+    :param user_id: int
+    :return: refresh_token -> str
+    """
     logger.info(f'Creating refresh token')
-    refresh_token = _create_token(
+    return _create_token(
         user_id=user_id,
         expires_delta=timedelta(days=settings.refresh_token_expire_days),
         token_type='refresh'
     )
 
-    return access_token, refresh_token
 
 
 def verify_token(token: str, expected_type: str) -> dict | None:
