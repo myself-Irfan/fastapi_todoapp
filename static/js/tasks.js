@@ -32,7 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!tasks.length) {
                 taskTable.classList.add('d-none');
-                emptyState.classList.remove('d-none');
+
+                const emptyState = document.getElementById('empty-state');
+                if (emptyState) {
+                    emptyState.classList.remove('d-none');
+                }
                 return;
             }
 
@@ -131,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 allTasks = allTasks.filter( task => task.id != taskId)
                 this.applyFilters();
-            } catch (err) {
+            } catch (error) {
                 console.error('Delete error:', error);
                 alert(error.message || 'Error deleting task');
 

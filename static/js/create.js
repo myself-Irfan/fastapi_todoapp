@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!this.validateForm()) return;
 
             UIUtils.setLoadingState(
-                'create-form',
+                'create-btn',
                 true,
                 'Creating...'
             )
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     error.message || 'Error creating task. Please try again.'
                 );
             } finally {
-                UIUtils.setLoadingState('create-form', false);
+                UIUtils.setLoadingState('create-btn', false);
             }
         }
 
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return true;
         }
 
-        validateOnBlue() {
+        validateOnBlur() {
             if (titleInput.value.trim()) {
                 this.validateForm();
             }
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         clearMessageOnInput() {
             const feedbackDiv = document.getElementById('feedback-message');
-            if (!feedback.classList.contains('d-none')) {
+            if (!feedbackDiv.classList.contains('d-none')) {
                 this.hideAllMessages();
             }
         }

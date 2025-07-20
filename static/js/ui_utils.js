@@ -46,7 +46,7 @@ class UIUtils {
         if (!feedback || !text ) return;
 
         feedback.className = `alert alert-${type} mt-3`;
-        feedback.className.remove('d-none');
+        feedback.classList.remove('d-none');
         text.textContent = message;
 
         if (icon) {
@@ -59,7 +59,7 @@ class UIUtils {
         const icon = document.getElementById(iconId);
         const text = document.getElementById(textId);
 
-        if (feedback) feedback.className.add('d-none');
+        if (feedback) feedback.classList.add('d-none');
         if (icon) icon.className = '';
         if (text) text.textContent = ''
     }
