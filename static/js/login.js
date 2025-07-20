@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('loginForm');
-    const alertBox = document.getElementById('alert-placeholder');
+    const alertContainer = 'alert-placeholder';
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
         // clear previous alert and validation
-        clearValidation();
-        alertBox.innerHTML = '';
+        UIUtils.clearValidation(['email', 'password']);
+        document.getElementById(alertContainer).innerHTML = '';
 
         const formData = {
             email: document.getElementById('email').value.trim(),
@@ -18,108 +18,56 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!validateForm(formData)) return;
 
         try {
-            const response = await fetch('/api/users/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
+            const response = await apiClient.post('/users/login', formData);
+            const data = await apiClient.handleResponse(response);
 
-            const data = await response.json();
+            // store tokens ; data?
+            const tokens = data.data || {};
+            apiClient.setTokens(tokens.access_token, tokens.refresh_token);
 
-             if (!response.ok) {
-                if (data.detail && Array.isArray(data.detail)) {
-                    handleServerValidation(data.detail);
-                } else {
-                    showAlert('danger', data.detail || 'Login failed');
-                }
-            } else {
-                const tokens = data.data || {};
+            UIUtils.showAlert(
+                alertContainer,
+                'success',
+                'Login successful. Redirecting...'
+            )
+            UIUtils.redirectAfterDelay('/');
 
-                localStorage.setItem('access_token', tokens.access_token);
-                localStorage.setItem('refresh_token', tokens.refresh_token);
-
-                showAlert('success', 'Login successful! Redirecting...');
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 1000);
-            }
         } catch (err) {
-            console.error('Login error:', err);
-            showAlert('danger', 'Something went wrong. Please try again later.');
+            // handle different error types
+            if (err.messages.includes('detail')) {
+                try {
+                    const errorData = JSON.parse(error.message);
+                    if (Array.isArray(errorData.detail)) {
+                        UIUtils.handleServerValidation(errorData.detail);
+                        return;
+                    }
+                } catch {}
+            }
+            UIUtils.showAlert(alertContainer, 'danger', error.message || 'Login failed.');
         }
     });
-
-    function showFieldError(fieldName, message) {
-        const field = document.getElementById(fieldName);
-        const feedback = field.nextElementSibling;
-
-        field.classList.add('is-invalid');
-        feedback.textContent = message;
-    }
-
-    function isValidEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
 
     function validateForm(data) {
         let isValid = true;
 
         // email validation
         if (!data.email) {
-            showFieldError('email', 'Email is required');
+            UIUtils.showFieldError('email', 'Email is required');
             isValid = false;
-        } else if (!isValidEmail(data.email)) {
-            showFieldError('email', 'Please enter a valid email');
+        } else if (!UIUtils.isValidEmail(data.email)) {
+            UIUtils.showFieldError('email', 'Please enter a valid email');
             isValid = false;
         }
 
         // password validation
         if (!data.password) {
-            showFieldError('password', 'Password is required');
+            UIUtils.showFieldError('password', 'Password is required');
             isValid = false;
         } else if (data.password.length < 5) {
-            showFieldError('password', 'Password must be at least 5 characters long');
+            UIUtils.showFieldError('password', 'Password must be at least 5 characters long');
             isValid = false
         }
 
         return isValid;
-    }
-
-    function clearValidation() {
-        ['email', 'password'].forEach(fieldName => {
-            const field = document.getElementById(fieldName);
-            const feedback = field.nextElementSibling;
-
-            field.classList.remove('is-invalid');
-            feedback.textContent = '';
-        });
-    }
-
-    function handleServerValidation(errors) {
-        if (Array.isArray(errors)) {
-            errors.forEach(error => {
-                const field = error.loc[1];
-                if (document.getElementById(field)) {
-                    showFieldError(field, error.msg);
-                }
-            });
-        } else {
-            Object.keys(errors).forEach(field => {
-                if (document.getElementById(field)) {
-                    showFieldError(field, errors[field]);
-                }
-            });
-        }
-    }
-
-    function showAlert(type, message) {
-        alertBox.innerHTML = `
-            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        `;
     }
 })

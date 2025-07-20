@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('registerForm');
-    const alertBox = document.getElementById('alert-placeholder')
+    const alertContainer = 'alert-placeholder'
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
         // clear previous alert and validation
-        clearValidation();
-        alertBox.innerHTML = '';
+        UIUtils.clearValidation();
+        document.getElementById(alertContainer).innerHTML = '';
 
         const formData = {
             name: document.getElementById('name').value.trim(),
@@ -19,43 +19,33 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!validateForm(formData)) return;
 
         try {
-            const response = await fetch('/api/users/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
+            const response = await apiClient.post('/users/register', formData);
+            const data = await apiClient.handleResponse(response);
 
-            const data = await response.json();
-
-            if (response.ok) {
-                showAlert('success', data.message || 'Registration successful');
-                setTimeout(() => window.location.href = '/login', 1500)
-            } else {
-                if (data.detail && typeof data.detail === 'object') {
-                    handleServerValidation(data.detail);
-                } else {
-                    showAlert('danger', data.detail || data.message || 'Registration failed');
-                }
-            }
+            UIUtils.showAlert(
+                alertContainer,
+                'success',
+                data.message || 'Registration successful'
+            )
+            UIUtils.redirectAfterDelay('/login')
         } catch (err) {
-            console.error('Registration error: ', err);
-            showAlert('danger', 'Network error. Please try again.')
+            if (err.message.includes('detail')) {
+                try {
+                    const errorData = = JSON.parse(err.message);
+                    if (errorData.detail && typeof errorData.detail === 'object') {
+                        UIUtils.handleServerValidation(errorData.detail);
+                        return;
+                    }
+                } catch {}
+            }
+
+            UIUtils.showAlert(
+                alertContainer,
+                'danger',
+                error.message || 'Registration failed'
+            );
         }
     });
-
-    function showFieldError(fieldName, message) {
-        const field = document.getElementById(fieldName);
-        const feedback = field.nextElementSibling;
-
-        field.classList.add('is-invalid');
-        feedback.textContent = message;
-    }
-
-    function isValidEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
 
     function validateForm(data) {
         let isValid = true;
@@ -89,41 +79,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return isValid;
     }
-
-    function clearValidation() {
-        ['name', 'email', 'password'].forEach(fieldName => {
-            const field = document.getElementById(fieldName);
-            const feedback = field.nextElementSibling;
-
-            field.classList.remove('is-invalid');
-            feedback.textContent = '';
-        });
-    }
-
-    function handleServerValidation(errors) {
-        if (Array.isArray(errors)) {
-            errors.forEach(error => {
-                const field = error.loc[1];
-                if (document.getElementById(field)) {
-                    showFieldError(field, error.msg);
-                }
-            });
-        } else {
-            Object.keys(errors).forEach(field => {
-                if (document.getElementById(field)) {
-                    showFieldError(field, errors[field]);
-                }
-            });
-        }
-    }
-
-    function showAlert(type, message) {
-        alertBox.innerHTML = `
-            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        `;
-    }
-
-})
+});
