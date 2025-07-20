@@ -13,12 +13,8 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
     async function fetchTask() {
         try {
-            const res = await fetch(`/api/tasks/${taskId}`);
-            if (!res.ok) {
-                const errData = await res.json().catch(() => ({}));
-                throw new Error(errData.detail || 'Failed to fetch task data');
-            }
-            const data = await res.json();
+            const res = await apiClient.get(`/tasks/${taskId}`);
+            const data = await apiClient.handleResponse(res);
             populateForm(data.data);
         } catch (err) {
             showFeedback('danger', 'Error loading task. Please try again');
@@ -85,22 +81,12 @@ document.addEventListener('DOMContentLoaded', ()=> {
         };
 
         try {
-            const res = await fetch(`/api/tasks/${taskId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload)
-            });
+            const res = await apiClient.put(`/tasks/${taskId}`, payload);
+            const data = await apiClient.handleResponse(res);
 
-            if (!res.ok) {
-                const data = await res.json().catch(() => ({}));
-                throw new Error(data.message || 'Failed to update task');
-            }
-
-            showFeedback('success', 'task updated successfully.');
+            showFeedback('success', 'Task updated successfully.');
             setTimeout(() => {
-                window.location.href = '/'
+                window.location.href = '/';
             }, 1500);
         } catch (err) {
             showFeedback('danger', err.message);
