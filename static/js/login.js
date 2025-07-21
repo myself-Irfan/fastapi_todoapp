@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (err) {
             // handle different error types
-            if (err.messages.includes('detail')) {
+            if (err.message.includes('detail')) {
                 try {
                     const errorData = JSON.parse(error.message);
                     if (Array.isArray(errorData.detail)) {
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } catch {}
             }
-            UIUtils.showAlert(alertContainer, 'danger', error.message || 'Login failed.');
+            UIUtils.showAlert(alertContainer, 'danger', err.message || 'Login failed.');
         }
     });
 

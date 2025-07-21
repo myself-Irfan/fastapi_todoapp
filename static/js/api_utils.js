@@ -84,7 +84,7 @@ class ApiClient {
                 }
             });
 
-            if (!response.ok) {
+            if (response.ok) {
                 const { data } = await response.json();
                 this.setTokens(data.access_token);
                 return true;

@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             if (err.message.includes('detail')) {
                 try {
-                    const errorData = = JSON.parse(err.message);
+                    const errorData = JSON.parse(err.message);
                     if (errorData.detail && typeof errorData.detail === 'object') {
                         UIUtils.handleServerValidation(errorData.detail);
                         return;

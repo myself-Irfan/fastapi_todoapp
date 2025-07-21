@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 from pathlib import Path
 from datetime import timedelta
@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = Field(default=7)
 
     # Database
-    db_url: str
+    db_url: str = Field()
 
     @property
     def access_token_expire(self) -> timedelta:
@@ -25,9 +25,10 @@ class Settings(BaseSettings):
     def refresh_token_expire(self) -> timedelta:
         return timedelta(days=self.refresh_token_expire_days)
 
-    class Config:
-        env_file = ".env"
+    model_config = SettingsConfigDict(
+        env_file=".env",
         env_file_encoding = "utf-8"
+    )
 
 # Instantiate settings to use everywhere
 settings = Settings()

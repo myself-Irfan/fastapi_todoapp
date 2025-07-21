@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <title>{% block title %}Task App{% endblock %}</title>
 
     <!-- Bootstrap CSS (CDN) -->
@@ -25,13 +26,8 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">All Tasks</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/create">Create Task</a>
-                </li>
+            <ul class="navbar-nav ms-auto" id="nav-links">
+
             </ul>
         </div>
     </div>
@@ -46,6 +42,7 @@
 <!-- Your custom JS -->
 <script src="/static/js/api_utils.js"></script>
 <script src="/static/js/ui_utils.js"></script>
+<script src="/static/js/nav-links.js"></script>
 {% block customjs %}{% endblock %}
 </body>
 </html>
