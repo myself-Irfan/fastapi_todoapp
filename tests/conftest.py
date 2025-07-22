@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -7,10 +7,10 @@ from sqlalchemy.orm import sessionmaker
 from app.main import app
 from app.database import Base, get_db
 
-TEST_DB_URL = 'sqlite:///./test.db'
 
-if os.path.exists('test.db'):
-    os.remove('test.db')
+TEST_DB_PATH = Path(__file__).parent / "test.db"
+TEST_DB_URL = f"sqlite:///{TEST_DB_PATH}"
+
 
 engine = create_engine(
     TEST_DB_URL,
@@ -22,9 +22,7 @@ TestingSessionLocal = sessionmaker(
     bind=engine
 )
 
-Base.metadata.create_all(bind=engine)
-
-
+# dependency override
 def override_get_db():
     db = TestingSessionLocal()
     try:
@@ -35,8 +33,24 @@ def override_get_db():
 app.dependency_overrides[get_db] = override_get_db
 
 
-@pytest.fixture(scope='module')
-def client():
+# fixtures
+# test db across all db
+@pytest.fixture(scope='session', autouse=True)
+def setup_test_db():
+    if TEST_DB_PATH.exists():
+        TEST_DB_PATH.unlink()
+
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
+
+    yield
+
+    # delete db after all test
+    if TEST_DB_PATH.exists():
+        TEST_DB_PATH.unlink()
+
+
+@pytest.fixture(scope='module')
+def client(setup_test_db):
     with TestClient(app) as c:
         yield c

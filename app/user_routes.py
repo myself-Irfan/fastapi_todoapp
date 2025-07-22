@@ -56,6 +56,8 @@ def create_user(payload: UserRegister, db: Session = Depends(get_db)) -> ApiResp
         return ApiResponse(
             message=f'User-{new_user.id} registered successfully'
         )
+    except HTTPException as http_err:
+        raise http_err
     except SQLAlchemyError as err:
         db.rollback()
         logger.error(f'Database error: {err}', exc_info=True)
