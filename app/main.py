@@ -1,18 +1,30 @@
 from fastapi import FastAPI
-from app.task_routes import router as task_api_router
-from app.user_routes import router as user_api_router
-from app.user_views import router as user_view_router
-from app.task_views import router as task_view_router
-from app.database import engine, Base
+from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
 
+from app.taskapp.task_routes import router as task_api_router
+from app.userapp.user_routes import router as user_api_router
+from app.userapp.user_views import router as user_view_router
+from app.taskapp.task_views import router as task_view_router
+from app.database import engine, Base
+from app.validation_handler import ValidationErrorHandler
 
-app = FastAPI(
-    title='Task Management App',
-    description='A task management App with JWT',
-    version='1.0.0'
-)
 
+def create_app() -> FastAPI:
+    app = FastAPI(
+        title='Task Management App',
+        description='A taskapp management App with JWT',
+        version='1.0.0'
+    )
+
+    app.add_exception_handler(
+        RequestValidationError,
+        ValidationErrorHandler.handle_validation_error
+    )
+
+    return app
+
+app = create_app()
 app.mount('/static', StaticFiles(directory='static'), name='static')
 
 Base.metadata.create_all(bind=engine)
@@ -26,4 +38,4 @@ app.include_router(task_view_router)
 # TODO: DB creation and migration scripts
 # TODO: JSON API response
 # TODO: User register and Login using JWT
-# TODO: crontab like job reminding user to do their task
+# TODO: crontab like job reminding user to do their taskapp
