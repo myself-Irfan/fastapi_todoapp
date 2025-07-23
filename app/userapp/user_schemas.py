@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
-from app.task_schemas import ApiResponse
+from app.taskapp.task_schemas import ApiResponse
 
 
 class UserRegister(BaseModel):

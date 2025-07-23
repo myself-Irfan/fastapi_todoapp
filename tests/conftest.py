@@ -1,7 +1,9 @@
 from pathlib import Path
+from unittest.mock import MagicMock
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 
 from app.main import app
@@ -67,3 +69,25 @@ def client():
     """Provide a test client for each test."""
     with TestClient(app) as c:
         yield c
+
+
+@pytest.fixture
+def broken_db(monkeypatch):
+    def _get_broken_db():
+        mock_db = MagicMock()
+        mock_db.query.side_effect = OperationalError(
+            statement="SELECT * FROM users",
+            params=None,
+            orig=Exception("Simulated DB failure")
+        )
+        mock_db.add = MagicMock()
+        mock_db.commit = MagicMock()
+        mock_db.rollback = MagicMock()
+        mock_db.refresh = MagicMock()
+        mock_db.close = MagicMock()
+        return mock_db
+
+    # Use setitem for dictionary-like objects
+    monkeypatch.setitem(app.dependency_overrides, get_db, _get_broken_db)
+    yield
+    # Cleanup is automatic with monkeypatch

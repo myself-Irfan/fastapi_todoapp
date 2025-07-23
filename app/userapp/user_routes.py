@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Header
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, OperationalError
 
 from app.auth import refresh_access_token
-from app.user_schemas import UserRegister, UserLogin, UserOut, ApiResponse, LoginResponse, RefreshTokenResponse, \
+from app.userapp.user_schemas import UserRegister, UserLogin, ApiResponse, LoginResponse, RefreshTokenResponse, \
     LoginTokenData, RefreshTokenData
 from app.database import get_db
 from app.models import User
@@ -58,6 +58,13 @@ def create_user(payload: UserRegister, db: Session = Depends(get_db)) -> ApiResp
         )
     except HTTPException as http_err:
         raise http_err
+    except OperationalError as op_err:
+        db.rollback()
+        logger.error(f'Database operation error: {op_err}')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f'Operation error: {op_err}'
+        ) from op_err
     except SQLAlchemyError as err:
         db.rollback()
         logger.error(f'Database error: {err}', exc_info=True)

@@ -15,7 +15,7 @@ templates = Jinja2Templates(directory='templates')
 @router.get('/', response_class=HTMLResponse)
 def render_index(request: Request):
     """
-    render the main task list page
+    render the main taskapp list page
     :param request:
     :return:
     """
@@ -25,7 +25,7 @@ def render_index(request: Request):
 @router.get('/create', response_class=HTMLResponse)
 def render_create(request: Request):
     """
-    render create task page
+    render create taskapp page
     :param request:
     :return:
     """
@@ -35,7 +35,7 @@ def render_create(request: Request):
 @router.get('/edit/{task_id}', response_class=HTMLResponse)
 def render_edit(request: Request, task_id: int):
     """
-    render edit task page
+    render edit taskapp page
     :param request:
     :return:
     """

@@ -40,14 +40,14 @@ class TestUserRegistration:
         }
         response = client.post("/api/users/register", json=payload)
 
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
         payload = {
             "email": "john.doe@example.com",
             "password": "securePassword123"
         }
         response = client.post("/api/users/register", json=payload)
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
         # Missing email
         payload = {
@@ -55,7 +55,7 @@ class TestUserRegistration:
             "password": "securePassword123"
         }
         response = client.post("/api/users/register", json=payload)
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
         # Missing password
         payload = {
@@ -63,4 +63,61 @@ class TestUserRegistration:
             "email": "john.doe@example.com"
         }
         response = client.post("/api/users/register", json=payload)
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+    def test_registration_invalid_mail_fmt(self, client):
+        invalid_mail_fmt = {
+            "invalid-email",
+            "invalid@",
+            "@invalid.com",
+            "invalid.email.com",
+            ""
+        }
+
+        for mail in invalid_mail_fmt:
+            payload = {
+                "email": mail,
+                "name": "irfan",
+                "password": '12345'
+            }
+            response = client.post("/api/users/register", json=payload)
+            assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+    def test_registration_db_error(self, broken_db, client):
+        """
+        Test registration with database error
+        """
+        payload = {
+            'name': 'irfan',
+            'email': 'ahmed.1995.irfan@gmail.com',
+            'password': '12345'
+        }
+
+        response = client.post('/api/users/register', json=payload)
+
+        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        response_data = response.json()
+
+        assert "Database error" in response_data['detail'] or "Operation error" in response_data['detail']
+
+
+    def test_registration_empty_str(self, client):
+        """
+        test with empty str fields
+        :param client:
+        :return:
+        """
+        payload = {
+            "name": "",
+            "email": "ahmed.1995.irfan@gmail.com",
+            "password": "12345"
+        }
+
+        response = client.post('/api/users/register', json=payload)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        response_data = response.json()
+
+        assert 'Field required' in response_data.get('detail')

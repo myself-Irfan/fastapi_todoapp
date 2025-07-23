@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.auth import get_cur_user
-from app.task_schemas import TaskCreate, TaskRead, TaskListResponse, TaskResponse, TaskUpdate, ApiResponse
+from app.taskapp.task_schemas import TaskCreate, TaskRead, TaskListResponse, TaskResponse, TaskUpdate, ApiResponse
 from app.database import get_db
 from app.models import Task
 from app.logger import get_logger
@@ -50,7 +50,7 @@ def get_all_tasks(db: Session = Depends(get_db)) -> TaskListResponse:
             )
         else:
             return TaskListResponse(
-                message="No task found",
+                message="No taskapp found",
                 data=[]
             )
 
@@ -71,8 +71,8 @@ def get_all_tasks(db: Session = Depends(get_db)) -> TaskListResponse:
 @router.get(
     "/{task_id}",
     response_model=TaskResponse,
-    summary='Get task by ID',
-    description='Retrieve a specific task by its ID',
+    summary='Get taskapp by ID',
+    description='Retrieve a specific taskapp by its ID',
     responses={
         200: {
             'description': 'Task retrieved successfully',
@@ -84,12 +84,12 @@ def get_all_tasks(db: Session = Depends(get_db)) -> TaskListResponse:
 )
 def get_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
     """
-    Retrieve a specific task by its ID.
-    Args: task_id: The ID of the task to retrieve, db: SQLAlchemy database session
-    Returns: TaskResponse containing the task data
-    Raises: HTTPException: If task not found or database operation fails
+    Retrieve a specific taskapp by its ID.
+    Args: task_id: The ID of the taskapp to retrieve, db: SQLAlchemy database session
+    Returns: TaskResponse containing the taskapp data
+    Raises: HTTPException: If taskapp not found or database operation fails
     """
-    logger.info(f'Fetching task with ID: {task_id}')
+    logger.info(f'Fetching taskapp with ID: {task_id}')
 
     try:
         task = db.get(Task, task_id)
@@ -102,7 +102,7 @@ def get_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
             )
 
         task_data = TaskRead.model_validate(task)
-        logger.info(f'Retrieved task: {task.title}')
+        logger.info(f'Retrieved taskapp: {task.title}')
         return TaskResponse(
             message='Task retrieved successfully',
             data=task_data
@@ -110,10 +110,10 @@ def get_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
     except HTTPException:
         raise
     except SQLAlchemyError as err:
-        logger.error(f'Database error while fetching task: {err}', exc_info=True)
+        logger.error(f'Database error while fetching taskapp: {err}', exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f'Database error while fetching task-{task_id}'
+            detail=f'Database error while fetching taskapp-{task_id}'
         ) from err
     except Exception as err:
         logger.error(f'Unexpected error: {err}', exc_info=True)
@@ -127,8 +127,8 @@ def get_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
     "/",
     response_model=ApiResponse,
     status_code=status.HTTP_201_CREATED,
-    summary='Create a new task',
-    description='Add a new task to database',
+    summary='Create a new taskapp',
+    description='Add a new taskapp to database',
     responses={
         201: {
             'description': 'Task created',
@@ -139,19 +139,19 @@ def get_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
 )
 def create_task(payload: TaskCreate, db: Session = Depends(get_db)) -> ApiResponse:
     """
-    Create a new task in the database.
-    Args: payload: TaskCreate schema with task data, db: SQLAlchemy database session
+    Create a new taskapp in the database.
+    Args: payload: TaskCreate schema with taskapp data, db: SQLAlchemy database session
     Returns: Dictionary with success message
     Raises: HTTPException: If database operation fails
     """
     try:
-        logger.info(f'Creating new task with title-{payload.title}')
+        logger.info(f'Creating new taskapp with title-{payload.title}')
 
         task = Task(**payload.model_dump())
         db.add(task)
         db.commit()
         db.refresh(task)
-        logger.info(f'Created task: {task.id}')
+        logger.info(f'Created taskapp: {task.id}')
         return TaskResponse(
             message=f'Task-{task.id} created successfully'
         )
@@ -173,8 +173,8 @@ def create_task(payload: TaskCreate, db: Session = Depends(get_db)) -> ApiRespon
 @router.put(
     '/{task_id}',
     response_model=TaskResponse,
-    summary='Update a task',
-    description='Update an existing task by its ID',
+    summary='Update a taskapp',
+    description='Update an existing taskapp by its ID',
     responses={
         200: {
             'description': 'Task updated successfully',
@@ -186,12 +186,12 @@ def create_task(payload: TaskCreate, db: Session = Depends(get_db)) -> ApiRespon
 )
 def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(get_db)) -> TaskResponse:
     """
-    Update an existing task by its ID.
-    Args: task_id: The ID of the task to update, payload: TaskUpdate schema with updated task data, db: SQLAlchemy database session
-    Returns: TaskResponse containing the updated task data
-    Raises: HTTPException: If task not found or database operation fails
+    Update an existing taskapp by its ID.
+    Args: task_id: The ID of the taskapp to update, payload: TaskUpdate schema with updated taskapp data, db: SQLAlchemy database session
+    Returns: TaskResponse containing the updated taskapp data
+    Raises: HTTPException: If taskapp not found or database operation fails
     """
-    logger.info(f'Fetching task-{task_id} for update')
+    logger.info(f'Fetching taskapp-{task_id} for update')
 
     try:
         task = db.get(Task, task_id)
@@ -215,14 +215,14 @@ def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(get_db)
         raise
     except SQLAlchemyError as err:
         db.rollback()
-        logger.error(f'Database error while updating task: {err}', exc_info=True)
+        logger.error(f'Database error while updating taskapp: {err}', exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f'Database error while updating task-{task_id}'
+            detail=f'Database error while updating taskapp-{task_id}'
         ) from err
     except Exception as err:
         db.rollback()
-        logger.error(f'Unexpected error while updating task: {err}', exc_info=True)
+        logger.error(f'Unexpected error while updating taskapp: {err}', exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='An unexpected error occurred'
@@ -230,8 +230,8 @@ def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(get_db)
 
 @router.delete(
     '/{task_id}',
-    summary='Delete a task',
-    description='Delete a task by its ID',
+    summary='Delete a taskapp',
+    description='Delete a taskapp by its ID',
     responses={
         200: {'description': 'Task deleted successfully'},
         404: {'description': 'Task not found'},
@@ -240,13 +240,13 @@ def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(get_db)
 )
 def delete_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
     """
-    Delete a task by its ID.
-    Args: task_id: The ID of the task to delete, db: SQLAlchemy database session
+    Delete a taskapp by its ID.
+    Args: task_id: The ID of the taskapp to delete, db: SQLAlchemy database session
     Returns: Dictionary with success message
-    Raises: HTTPException: If task not found or database operation fails
+    Raises: HTTPException: If taskapp not found or database operation fails
     """
     try:
-        logger.info(f'Deleting task-{task_id}')
+        logger.info(f'Deleting taskapp-{task_id}')
 
         task = db.get(Task, task_id)
 
@@ -267,14 +267,14 @@ def delete_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
         raise
     except SQLAlchemyError as err:
         db.rollback()
-        logger.error(f'Database error while deleting task: {err}', exc_info=True)
+        logger.error(f'Database error while deleting taskapp: {err}', exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f'Database error while deleting task-{task_id}'
+            detail=f'Database error while deleting taskapp-{task_id}'
         ) from err
     except Exception as err:
         db.rollback()
-        logger.error(f'Unexpected error while deleting task: {err}', exc_info=True)
+        logger.error(f'Unexpected error while deleting taskapp: {err}', exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='An unexpected error occurred'
