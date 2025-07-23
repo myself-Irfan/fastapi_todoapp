@@ -33,9 +33,7 @@ app.include_router(user_view_router)
 app.include_router(task_api_router)
 app.include_router(task_view_router)
 
-# TODO: use HTML + JS
 # TODO: Need to finish
 # TODO: DB creation and migration scripts
-# TODO: JSON API response
-# TODO: User register and Login using JWT
 # TODO: crontab like job reminding user to do their taskapp
+# TODO: add CI/CD

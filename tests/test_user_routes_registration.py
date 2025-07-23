@@ -121,3 +121,20 @@ class TestUserRegistration:
         response_data = response.json()
 
         assert 'Field required' in response_data.get('detail')
+
+    def test_registration_long_field(self, client):
+        """
+        test long field registration
+        :param client:
+        :return:
+        """
+        payload = {
+            "name": "x" * 1000,
+            "email": "ahmed.1995.irfan@gmail.com",
+            "password": "12345"
+        }
+
+        response = client.post('/api/users/register', json=payload)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert 'name should have at most 100 characters' in response.json().get('detail')
