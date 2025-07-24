@@ -41,3 +41,63 @@ class TestUserLogin:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert response.json()['detail'] == 'User not registered'
 
+
+    def test_user_login_wrong_pwd(self, client):
+        reg_payload = {
+            "name": "irfan",
+            "email": "ahmed.1995.irfan@gmail.com",
+            "password": "12345"
+        }
+        client.post("/api/users/register", json=reg_payload)
+
+        login_payload = {
+            "email": "ahmed.1995.irfan@gmail.com",
+            "password": "12346789"
+        }
+        response = client.post("/api/users/login", json=login_payload)
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.json().get('detail') == 'Invalid credentials'
+
+
+    def test_user_login_short_pwd(self, client):
+        reg_payload = {
+            "name": "irfan",
+            "email": "ahmed.1995.irfan@gmail.com",
+            "password": "12345"
+        }
+        client.post("/api/users/register", json=reg_payload)
+
+        login_payload = {
+            "email": "ahmed.1995.irfan@gmail.com",
+            "password": "1234"
+        }
+        response = client.post("/api/users/login", json=login_payload)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json().get('detail') == 'password should have at least 5 characters'
+
+
+    def test_user_login_missing_cred(self, client):
+        reg_payload = {
+            "name": "irfan",
+            "email": "ahmed.1995.irfan@gmail.com",
+            "password": "12345"
+        }
+        client.post("/api/users/register", json=reg_payload)
+
+        login_payload = {
+            "password": "12345"
+        }
+        response = client.post("/api/users/login", json=login_payload)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert 'Field required' in response.json().get('detail')
+
+        login_payload = {
+            "email": "ahmed.1995.irfan@gmail.com"
+        }
+        response = client.post("/api/users/login", json=login_payload)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert 'Field required' in response.json().get('detail')
