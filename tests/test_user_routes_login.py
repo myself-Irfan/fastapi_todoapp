@@ -101,3 +101,46 @@ class TestUserLogin:
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert 'Field required' in response.json().get('detail')
+
+
+    def test_user_login_invalid_fmt(self, client):
+        reg_payload = {
+            "name": "irfan",
+            "email": "ahmed.1995.irfan@gmail.com",
+            "password": "12345"
+        }
+        client.post("/api/users/register", json=reg_payload)
+
+        invalid_mail_fmt = {
+            "invalid-email",
+            "invalid@",
+            "@invalid.com",
+            "invalid.email.com",
+            ""
+        }
+
+        for mail in invalid_mail_fmt:
+            payload = {
+                "email": mail,
+                "password": "12345"
+            }
+            response = client.post("/api/users/login", json=payload)
+            assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+    def test_user_login_db_error(self, broken_db, client):
+        reg_payload = {
+            "name": "irfan",
+            "email": "ahmed.1995.irfan@gmail.com",
+            "password": "12345"
+        }
+        client.post("/api/users/register", json=reg_payload)
+
+        login_payload = {
+            "email": "ahmed.1995.irfan@gmail.com",
+            "password": "12345"
+        }
+        response = client.post("/api/users/login", json=login_payload)
+
+        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        assert 'Operation error' in response.json().get('detail')

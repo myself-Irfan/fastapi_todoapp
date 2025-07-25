@@ -138,6 +138,18 @@ def login_user(user_data: UserLogin, db: Session = Depends(get_db)) -> LoginResp
         )
     except HTTPException:
         raise
+    except OperationalError as op_err:
+        logger.error(f'Operation error: {op_err}')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f'Operation error: {op_err}'
+        ) from op_err
+    except SQLAlchemyError as sql_err:
+        logger.error(f'SQL error: {sql_err}')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f'SQL error: {sql_err}'
+        ) from sql_err
     except Exception as err:
         logger.error(f'Unexpected error during login: {err}')
         raise HTTPException(
