@@ -1,6 +1,4 @@
-import pytest
 from fastapi import status
-from unittest.mock import patch
 
 
 class TestTaskRoutes:
@@ -9,8 +7,7 @@ class TestTaskRoutes:
     """
     task_url = '/api/tasks'
 
-    @staticmethod
-    def _auth_headers(client) -> dict:
+    def _auth_headers(self, client) -> dict:
         """
         helper func to get auth headers
         :param client:
@@ -33,6 +30,14 @@ class TestTaskRoutes:
 
         return {'Authorization': f'Bearer {access_token}'}
 
+    def _create_task(self, client, auth_headers):
+        payload = {
+            "title": "Test Task",
+            "description": "Test Description",
+            "completed": False
+        }
+
+        return client.post(self.task_url, headers=auth_headers, json=payload)
 
     def test_get_all_tasks_empty(self, client):
         """
@@ -46,3 +51,19 @@ class TestTaskRoutes:
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert 'No task found' in response.json().get('detail')
+
+    def test_get_all_tasks(self, client):
+        """
+        test get all task
+        :param client:
+        :return:
+        """
+        auth_headers = self._auth_headers(client)
+
+        _ = self._create_task(client, auth_headers)
+
+        response = client.get(self.task_url, headers=auth_headers)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "Tasks retrieved successfully" in response.json().get('message')
+        assert len(response.json().get('data')) > 0

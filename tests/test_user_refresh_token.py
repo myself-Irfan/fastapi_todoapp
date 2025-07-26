@@ -6,6 +6,7 @@ class TestUserRefreshToken:
     """
     test cases for /api/users/refresh-token
     """
+
     @staticmethod
     def _initial_registration(client):
         reg_payload = {
@@ -23,7 +24,7 @@ class TestUserRefreshToken:
             "password": "12345"
         }
 
-        login_response = client.post("/api/users/login",json=login_payload)
+        login_response = client.post("/api/users/login", json=login_payload)
         refresh_token = login_response.json().get('data').get('refresh_token')
 
         headers = {"Authorization": f'Bearer {refresh_token}'}
@@ -32,7 +33,6 @@ class TestUserRefreshToken:
         assert response.status_code == status.HTTP_200_OK
         assert "Access token refreshed" in response.json().get('message')
         assert 'access_token' in response.json().get('data')
-
 
     def test_refresh_token_invalid_fmt(self, client):
         self._initial_registration(client)
@@ -43,7 +43,6 @@ class TestUserRefreshToken:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert 'Invalid Authorization header format' in response.json().get('detail')
 
-
     def test_refresh_token_missing_header(self, client):
         self._initial_registration(client)
 
@@ -51,7 +50,6 @@ class TestUserRefreshToken:
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert 'Field required' in response.json().get('detail')
-
 
     def test_refresh_token_invalid_token(self, client):
         self._initial_registration(client)

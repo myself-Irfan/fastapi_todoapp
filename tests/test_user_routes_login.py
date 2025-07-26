@@ -30,7 +30,6 @@ class TestUserLogin:
         assert "access_token" in token_data
         assert "refresh_token" in token_data
 
-
     def test_nonexistent_user_login(self, client):
         payload = {
             "email": "ahmed.1995.irfan@gmail.com",
@@ -40,7 +39,6 @@ class TestUserLogin:
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert response.json()['detail'] == 'User not registered'
-
 
     def test_user_login_wrong_pwd(self, client):
         reg_payload = {
@@ -59,7 +57,6 @@ class TestUserLogin:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert response.json().get('detail') == 'Invalid credentials'
 
-
     def test_user_login_short_pwd(self, client):
         reg_payload = {
             "name": "irfan",
@@ -76,7 +73,6 @@ class TestUserLogin:
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json().get('detail') == 'password should have at least 5 characters'
-
 
     def test_user_login_missing_cred(self, client):
         reg_payload = {
@@ -102,7 +98,6 @@ class TestUserLogin:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert 'Field required' in response.json().get('detail')
 
-
     def test_user_login_invalid_fmt(self, client):
         reg_payload = {
             "name": "irfan",
@@ -126,7 +121,6 @@ class TestUserLogin:
             }
             response = client.post("/api/users/login", json=payload)
             assert response.status_code == status.HTTP_400_BAD_REQUEST
-
 
     def test_user_login_db_error(self, broken_db, client):
         reg_payload = {

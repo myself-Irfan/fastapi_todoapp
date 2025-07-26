@@ -171,6 +171,7 @@ def create_task(payload: TaskCreate, db: Session = Depends(get_db)) -> ApiRespon
             detail=f'Unexpected error: {err}'
         ) from err
 
+
 @router.put(
     '/{task_id}',
     response_model=TaskResponse,
@@ -228,6 +229,7 @@ def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(get_db)
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='An unexpected error occurred'
         ) from err
+
 
 @router.delete(
     '/{task_id}',

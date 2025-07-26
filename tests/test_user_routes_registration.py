@@ -20,7 +20,6 @@ class TestUserRegistration:
         assert "User-" in response_data.get("message")
         assert "registered successfully" in response_data.get("message")
 
-
     def test_duplicate_user_registration(self, client):
         payload = {
             'name': 'Test User',
@@ -32,7 +31,6 @@ class TestUserRegistration:
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.json()['detail'] == 'Email already in use'
-
 
     def test_registration_missing_fields(self, client):
         payload = {
@@ -65,7 +63,6 @@ class TestUserRegistration:
         response = client.post("/api/users/register", json=payload)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-
     def test_registration_invalid_mail_fmt(self, client):
         invalid_mail_fmt = {
             "invalid-email",
@@ -84,7 +81,6 @@ class TestUserRegistration:
             response = client.post("/api/users/register", json=payload)
             assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-
     def test_registration_db_error(self, broken_db, client):
         """
         Test registration with database error
@@ -101,7 +97,6 @@ class TestUserRegistration:
         response_data = response.json()
 
         assert "Database error" in response_data['detail'] or "Operation error" in response_data['detail']
-
 
     def test_registration_empty_str(self, client):
         """
