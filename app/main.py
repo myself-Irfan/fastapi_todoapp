@@ -14,7 +14,9 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title='Task Management App',
         description='A taskapp management App with JWT',
-        version='1.0.0'
+        version='1.0.0',
+        docs_url='/docs',
+        redoc_url='/redoc'
     )
 
     app.add_exception_handler(
@@ -28,12 +30,14 @@ app = create_app()
 app.mount('/static', StaticFiles(directory='static'), name='static')
 
 Base.metadata.create_all(bind=engine)
+
+
 app.include_router(user_api_router)
 app.include_router(user_view_router)
 app.include_router(task_api_router)
 app.include_router(task_view_router)
 
 # TODO: Need to finish
-# TODO: DB creation and migration scripts
+# TODO: Change tasks JS to handle task not found 404
 # TODO: crontab like job reminding user to do their taskapp
 # TODO: add CI/CD

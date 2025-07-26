@@ -49,11 +49,12 @@ def get_all_tasks(db: Session = Depends(get_db)) -> TaskListResponse:
                 data=task_data
             )
         else:
-            return TaskListResponse(
-                message="No taskapp found",
-                data=[]
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail='No task found'
             )
-
+    except HTTPException as http_err:
+        raise http_err
     except SQLAlchemyError as e:
         logger.error(f"Database error while fetching tasks: {e}", exc_info=True)
         raise HTTPException(
