@@ -90,7 +90,7 @@ def get_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
     Returns: TaskResponse containing the taskapp data
     Raises: HTTPException: If taskapp not found or database operation fails
     """
-    logger.info(f'Fetching taskapp with ID: {task_id}')
+    logger.info(f'Fetching task with ID: {task_id}')
 
     try:
         task = db.get(Task, task_id)
@@ -128,8 +128,8 @@ def get_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
     "/",
     response_model=ApiResponse,
     status_code=status.HTTP_201_CREATED,
-    summary='Create a new taskapp',
-    description='Add a new taskapp to database',
+    summary='Create a new task object',
+    description='Add a new object to tasklist table database',
     responses={
         201: {
             'description': 'Task created',
@@ -140,13 +140,13 @@ def get_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
 )
 def create_task(payload: TaskCreate, db: Session = Depends(get_db)) -> ApiResponse:
     """
-    Create a new taskapp in the database.
-    Args: payload: TaskCreate schema with taskapp data, db: SQLAlchemy database session
+    Create a new task in the database.
+    Args: payload: TaskCreate schema with task data, db: SQLAlchemy database session
     Returns: Dictionary with success message
     Raises: HTTPException: If database operation fails
     """
     try:
-        logger.info(f'Creating new taskapp with title-{payload.title}')
+        logger.info(f'Creating new task with title-{payload.title}')
 
         task = Task(**payload.model_dump())
         db.add(task)
@@ -175,8 +175,8 @@ def create_task(payload: TaskCreate, db: Session = Depends(get_db)) -> ApiRespon
 @router.put(
     '/{task_id}',
     response_model=TaskResponse,
-    summary='Update a taskapp',
-    description='Update an existing taskapp by its ID',
+    summary='Update a task',
+    description='Update an existing task by its ID',
     responses={
         200: {
             'description': 'Task updated successfully',
