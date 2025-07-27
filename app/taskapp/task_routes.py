@@ -270,14 +270,14 @@ def delete_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
         raise
     except SQLAlchemyError as err:
         db.rollback()
-        logger.error(f'Database error while deleting taskapp: {err}', exc_info=True)
+        logger.error(f'Database error while deleting task: {err}', exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f'Database error while deleting taskapp-{task_id}'
+            detail=f'Database error while deleting task-{task_id}'
         ) from err
     except Exception as err:
         db.rollback()
-        logger.error(f'Unexpected error while deleting taskapp: {err}', exc_info=True)
+        logger.error(f'Unexpected error while deleting task: {err}', exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='An unexpected error occurred'

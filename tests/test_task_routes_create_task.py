@@ -87,6 +87,25 @@ class TestTaskCreate:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert 'Field required' in response.json().get('detail')
 
+    def test_create_task_not_bool(self, client):
+        """
+        test create task with empty title
+        :param client:
+        :return:
+        """
+        auth_headers = self._auth_headers(client)
+
+        task_payload = {
+            "title": "",
+            "description": "Test description",
+            "is_complete": "True"
+        }
+
+        response = client.post(self._task_url, headers=auth_headers, json=task_payload)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert 'Field required' in response.json().get('detail')
+
     def test_create_task_unauthorized(self, client):
         """
         test create task with no auth
@@ -97,3 +116,20 @@ class TestTaskCreate:
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert 'Not authenticated' in response.json().get('detail')
+
+    def test_create_task_null_values(self, client):
+        """
+        test create task with null values
+        :param client:
+        :return:
+        """
+        auth_headers = self._auth_headers(client)
+
+        task_payload = {
+            "title": None,
+            "description": None,
+            "is_complete": None
+        }
+        response = client.post(self._task_url, headers=auth_headers, json=task_payload)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
