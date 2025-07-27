@@ -2,9 +2,8 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
 
-from app.database import *
+from app.database.core import *
 from app.config import settings
-from app.models import User, Task
 
 # alembic config obj
 config = context.config

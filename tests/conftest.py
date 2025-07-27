@@ -7,7 +7,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 
 from app.main import app
-from app.database import Base, get_db
+from app.database.core import Base, get_db
 
 TEST_DB_PATH = Path(__file__).parent / "test.db"
 TEST_DB_URL = f"sqlite:///{TEST_DB_PATH}"

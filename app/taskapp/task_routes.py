@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.auth import get_cur_user
 from app.taskapp.task_schemas import TaskCreate, TaskRead, TaskListResponse, TaskResponse, TaskUpdate, ApiResponse
-from app.database import get_db
+from app.database.core import get_db
 from app.models import Task
 from app.logger import get_logger
 

@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError, OperationalError
 from app.auth import refresh_access_token
 from app.userapp.user_schemas import UserRegister, UserLogin, ApiResponse, LoginResponse, RefreshTokenResponse, \
     LoginTokenData, RefreshTokenData
-from app.database import get_db
+from app.database.core import get_db
 from app.models import User
 from app.logger import get_logger
 from app.security import hash_pwd, verify_pwd, gen_access_token, gen_refresh_token

@@ -1,10 +1,9 @@
-from typing import Tuple
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.database import get_db
+from app.database.core import get_db
 from app.models import User
 from app.security import get_user_from_token, gen_access_token
 from app.logger import get_logger

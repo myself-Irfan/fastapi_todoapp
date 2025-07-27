@@ -6,7 +6,7 @@ from app.taskapp.task_routes import router as task_api_router
 from app.userapp.user_routes import router as user_api_router
 from app.userapp.user_views import router as user_view_router
 from app.taskapp.task_views import router as task_view_router
-from app.database import engine, Base
+from app.database.core import engine, Base
 from app.validation_handler import ValidationErrorHandler
 
 
@@ -41,3 +41,5 @@ app.include_router(task_view_router)
 # TODO: Change tasks JS to handle task not found 404
 # TODO: crontab like job reminding user to do their taskapp
 # TODO: add CI/CD
+# TODO: rate limiting
+# TODO: Clean architecture -> https://www.youtube.com/watch?v=H9Blu0kWdZE
