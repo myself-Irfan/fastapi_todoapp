@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.auth import get_cur_user
 from app.taskapp.task_schemas import TaskCreate, TaskRead, TaskListResponse, TaskResponse, TaskUpdate, ApiResponse
-from app.database.core import get_db
-from app.models import Task
+from app.database.core import DbSession
+from app.entities.task import Task
 from app.logger import get_logger
 
 router = APIRouter(
@@ -29,7 +28,7 @@ logger = get_logger(__name__)
         500: {"description": "Internal server error"}
     }
 )
-def get_all_tasks(db: Session = Depends(get_db)) -> TaskListResponse:
+def get_all_tasks(db: DbSession) -> TaskListResponse:
     """
     Retrieve all tasks from the database.
     Args: db: SQLAlchemy database session
@@ -83,7 +82,7 @@ def get_all_tasks(db: Session = Depends(get_db)) -> TaskListResponse:
         500: {'description': 'Internal server error'}
     }
 )
-def get_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
+def get_task(task_id: int, db: DbSession) -> TaskResponse:
     """
     Retrieve a specific taskapp by its ID.
     Args: task_id: The ID of the taskapp to retrieve, db: SQLAlchemy database session
@@ -138,7 +137,7 @@ def get_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
         500: {'description': 'Internal server error'}
     }
 )
-def create_task(payload: TaskCreate, db: Session = Depends(get_db)) -> ApiResponse:
+def create_task(payload: TaskCreate, db: DbSession) -> ApiResponse:
     """
     Create a new task in the database.
     Args: payload: TaskCreate schema with task data, db: SQLAlchemy database session
@@ -186,7 +185,7 @@ def create_task(payload: TaskCreate, db: Session = Depends(get_db)) -> ApiRespon
         500: {'description': 'Internal server error'}
     }
 )
-def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(get_db)) -> TaskResponse:
+def update_task(task_id: int, payload: TaskUpdate, db: DbSession) -> TaskResponse:
     """
     Update an existing taskapp by its ID.
     Args: task_id: The ID of the taskapp to update, payload: TaskUpdate schema with updated taskapp data, db: SQLAlchemy database session
@@ -241,7 +240,7 @@ def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(get_db)
         500: {'description': 'Internal server error'}
     }
 )
-def delete_task(task_id: int, db: Session = Depends(get_db)) -> TaskResponse:
+def delete_task(task_id: int, db: DbSession) -> TaskResponse:
     """
     Delete a taskapp by its ID.
     Args: task_id: The ID of the taskapp to delete, db: SQLAlchemy database session

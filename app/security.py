@@ -17,7 +17,7 @@ _pwd_hasher = PasswordHasher(
 logger = get_logger(__name__)
 
 
-class AuthError(Exception):
+class AuthenticationError(Exception):
     pass
 
 
@@ -36,7 +36,7 @@ def hash_pwd(pwd_str: str) -> str:
         return _pwd_hasher.hash(pwd_str)
     except HashingError as err:
         logger.error(f'Password hashing failed: {err}')
-        raise AuthError(f'Password hashing failed: {err}') from err
+        raise AuthenticationError(f'Password hashing failed: {err}') from err
 
 
 def verify_pwd(pwd_hashed: str, pwd_str: str) -> tuple[bool, bool]:
