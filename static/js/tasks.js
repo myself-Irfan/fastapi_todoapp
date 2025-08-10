@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // created at
             const createTimeTd = document.createElement('td');
             createTimeTd.classList.add('d-none', 'd-md-table-cell');
-            createTimeTd.textContent = task.created_at;
+            createTimeTd.textContent = UIUtils.formatDateTime(task.created_at);
             row.appendChild(createTimeTd);
 
             // action col

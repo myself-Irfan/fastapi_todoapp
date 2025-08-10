@@ -122,6 +122,19 @@ class UIUtils {
         return formatted;
     }
 
+    static formatDateTime(isoString) {
+        if (!isoString) return '-';
+        const date = new Date(isoString);
+        return date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+
     static setMinDate(inputId) {
         const input = document.getElementById(inputId);
         if (input) input.min = new Date().toISOString().split('T')[0];
