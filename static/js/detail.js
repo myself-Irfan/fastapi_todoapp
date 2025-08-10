@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'task-description': task.description || 'No description provided',
                 'task-status': task.is_complete ? 'Complete' : 'Pending',
                 'task-due-date': UIUtils.formatDateWithOrdinal(task.due_date),
-                'task-created_at': task.created_at
+                'task-created-at': task.created_at
             };
 
             Object.entries(elements).forEach(([id, value]) => {

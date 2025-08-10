@@ -96,6 +96,7 @@ class UIUtils {
 
     // date util
     static formatDateWithOrdinal(dateStr) {
+        if (!dateStr) return '-';
         const dateObj = new Date(dateStr);
         if (isNaN(dateObj)) return '-';
 
