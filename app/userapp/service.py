@@ -41,7 +41,7 @@ class UserService:
         """
         existing_user = self.__fetch_user_by_email(user_data.email)
 
-        if existing_user is not None:
+        if existing_user:
             logger.warning(f'User with email {user_data.email} already exists')
             return None
 
@@ -63,11 +63,11 @@ class UserService:
         except (OperationalError, SQLAlchemyError) as db_err:
             self.db.rollback()
             logger.error(f'Database error during user creation: {db_err}')
-            raise
+            return None
         except Exception as err:
             self.db.rollback()
             logger.error(f'Unexpected error during user creation: {err}')
-            raise
+            return None
 
     def login_user(self, email: EmailStr, password: str) -> User | None:
         """

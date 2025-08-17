@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
 
+from app.auth.controller import router as auth_api_router
 from app.taskapp.controller import router as task_api_router
 from app.userapp.controller import router as user_api_router
 from app.userapp.view import router as user_view_router
@@ -31,7 +32,7 @@ app.mount('/static', StaticFiles(directory='static'), name='static')
 
 Base.metadata.create_all(bind=engine)
 
-
+app.include_router(auth_api_router)
 app.include_router(user_api_router)
 app.include_router(user_view_router)
 app.include_router(task_api_router)

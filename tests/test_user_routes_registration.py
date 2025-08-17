@@ -18,7 +18,7 @@ class TestUserRegistration:
         response_data = response.json()
         assert "message" in response_data
         assert "User-" in response_data.get("message")
-        assert "registered successfully" in response_data.get("message")
+        assert "created successfully" in response_data.get("message")
 
     def test_duplicate_user_registration(self, client):
         payload = {
