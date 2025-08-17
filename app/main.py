@@ -2,9 +2,9 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
 
-from app.taskapp.task_routes import router as task_api_router
-from app.userapp.user_routes import router as user_api_router
-from app.userapp.user_views import router as user_view_router
+from app.taskapp.controller import router as task_api_router
+from app.userapp.controller import router as user_api_router
+from app.userapp.view import router as user_view_router
 from app.taskapp.task_views import router as task_view_router
 from app.database.core import engine, Base
 from app.validation_handler import ValidationErrorHandler

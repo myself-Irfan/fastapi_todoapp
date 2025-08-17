@@ -12,7 +12,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 templates = Jinja2Templates(directory='templates')
 
 
-@router.get('/register', response_class=HTMLResponse)
+@router.get(
+    '/register',
+    response_class=HTMLResponse,
+    summary='Render user registration page',
+    description='Render the user registration page where new users can sign up'
+)
 def render_register(request: Request):
     """
     render register user page

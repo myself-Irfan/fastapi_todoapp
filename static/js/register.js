@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
 
         // clear previous alert and validation
-        UIUtils.clearValidation();
+        UIUtils.clearValidation(['name', 'email', 'password']);
         document.getElementById(alertContainer).innerHTML = '';
 
         const formData = {
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!data.email) {
             showFieldError('email', 'Email is required');
             isValid = false;
-        } else if (!isValidEmail(data.email)) {
+        } else if (!UIUtils.isValidEmail(data.email)) {
             showFieldError('email', 'Please enter a valid email');
             isValid = false;
         }

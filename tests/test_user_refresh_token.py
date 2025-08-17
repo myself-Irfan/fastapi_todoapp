@@ -28,7 +28,7 @@ class TestUserRefreshToken:
         refresh_token = login_response.json().get('data').get('refresh_token')
 
         headers = {"Authorization": f'Bearer {refresh_token}'}
-        response = client.post('/api/users/refresh-token', headers=headers)
+        response = client.post('/api/auth/refresh-token', headers=headers)
 
         assert response.status_code == status.HTTP_200_OK
         assert "Access token refreshed" in response.json().get('message')
@@ -38,7 +38,7 @@ class TestUserRefreshToken:
         self._initial_registration(client)
 
         headers = {'Authorization': 'invalid_fmt_token'}
-        response = client.post('/api/users/refresh-token', headers=headers)
+        response = client.post('/api/auth/refresh-token', headers=headers)
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert 'Invalid Authorization header format' in response.json().get('detail')
@@ -46,7 +46,7 @@ class TestUserRefreshToken:
     def test_refresh_token_missing_header(self, client):
         self._initial_registration(client)
 
-        response = client.post('/api/users/refresh-token')
+        response = client.post('/api/auth/refresh-token')
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert 'Field required' in response.json().get('detail')
@@ -56,7 +56,7 @@ class TestUserRefreshToken:
 
         headers = {'Authorization': 'Bearer invalid-token'}
 
-        response = client.post('/api/users/refresh-token', headers=headers)
+        response = client.post('/api/auth/refresh-token', headers=headers)
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert 'Invalid refresh token' in response.json().get('detail')

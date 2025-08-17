@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
 
 from app.auth.model import LoginTokenData
-from app.taskapp.task_schemas import ApiResponse
+from app.taskapp.model import ApiResponse
 
 
 class UserRegister(BaseModel):
@@ -26,10 +26,4 @@ class UserOut(BaseModel):
 class LoginResponse(ApiResponse):
     data: LoginTokenData
 
-
-class RefreshTokenData(BaseModel):
-    access_token: str
-
-class RefreshTokenResponse(ApiResponse):
-    data: RefreshTokenData
 
