@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status, HTTPException, Header, Depends
 
 from app.auth.service import AuthenticationService
 from app.logger import get_logger
@@ -26,7 +26,7 @@ logger = get_logger(__name__)
         500: {'description': 'Internal server error'}
     }
 )
-def refresh_user_access_token(authorization: str, db: DbSession) -> RefreshTokenResponse:
+def refresh_user_access_token(db: DbSession, authorization: str = Header(...)) -> RefreshTokenResponse:
     """
     Refresh user access token using a valid refresh token
     """

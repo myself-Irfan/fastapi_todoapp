@@ -62,7 +62,7 @@ class TestUserRefreshToken:
         assert 'Invalid refresh token' in response.json().get('detail')
 
     # TODO: Need to understand
-    @patch('app.userapp.user_routes.verify_pwd')
+    @patch('app.auth.service.AuthenticationService.verify_pwd')
     def test_user_login_password_rehash(self, mock_verify_pwd, client):
         self._initial_registration(client)
 

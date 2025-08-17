@@ -87,7 +87,7 @@ def login_user(user_data: UserLogin, user_service: UserService = Depends(get_use
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="User not registered"
+                detail="Invalid credentials"
             )
 
         access_token = AuthenticationService.generate_access_token(user.id)
