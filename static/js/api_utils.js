@@ -64,10 +64,17 @@ class ApiClient {
                 }
             }
 
+            // if still 401 after refresh attempt or no refresh token, redirect to login
+            if (response.status === 401) {
+                this.clearTokens();
+                window.location.href = '/login';
+                throw new Error('Unauthorized. Please log in again.');
+            }
+
             return response
         } catch (err) {
             console.error('Request failed:', err);
-            throw error;
+            throw err;
         }
     }
 
