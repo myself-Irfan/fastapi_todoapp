@@ -140,12 +140,12 @@ class AuthenticationService:
         :return:
         """
 
-        if not token:
-            logger.warning('Token not received')
+        if not token or not isinstance(token, str):
+            logger.warning(f'Invalid token input: {"missing" if not token else "not a string"}')
             return None
 
-        if not isinstance(token, str):
-            logger.warning('Invalid token format')
+        if not expected_type:
+            logger.warning('Expected token type is required')
             return None
 
         try:
