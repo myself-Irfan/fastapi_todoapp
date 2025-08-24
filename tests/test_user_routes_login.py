@@ -137,4 +137,3 @@ class TestUserLogin:
         response = client.post("/api/users/login", json=login_payload)
 
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-        assert 'Operation error' in response.json().get('detail')

@@ -43,6 +43,9 @@ def register_user(payload: UserRegister, user_service: UserService = Depends(get
     try:
         user = user_service.create_registered_user(payload)
 
+        if user is None:
+            raise ValueError('Email already in use')
+
         return ApiResponse(
             message=f'User-{user.id} created successfully',
         )
