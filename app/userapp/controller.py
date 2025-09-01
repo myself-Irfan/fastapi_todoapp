@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
 
 from app.auth.service import AuthenticationService
@@ -6,6 +6,7 @@ from app.userapp.model import UserRegister, UserLogin, ApiResponse, LoginRespons
 from app.database.core import DbSession
 from app.logger import get_logger
 from app.userapp.service import UserService
+from app.rate_limiter import limiter
 
 router = APIRouter(
     prefix='/api/users',
@@ -37,7 +38,8 @@ def get_user_service(db: DbSession) -> UserService:
         500: {'description': 'Internal server error'}
     }
 )
-def register_user(payload: UserRegister, user_service: UserService = Depends(get_user_service)) -> ApiResponse:
+@limiter.limit("5/hour")
+def register_user(request: Request, payload: UserRegister, user_service: UserService = Depends(get_user_service)) -> ApiResponse:
     logger.info(f'Received payload: {payload}')
 
     try:
