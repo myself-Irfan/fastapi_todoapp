@@ -25,5 +25,3 @@ class UserOut(BaseModel):
 
 class LoginResponse(ApiResponse):
     data: LoginTokenData
-
-

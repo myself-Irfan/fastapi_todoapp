@@ -44,3 +44,4 @@ app.include_router(task_view_router)
 # TODO: add CI/CD
 # TODO: rate limiting
 # TODO: Clean architecture -> https://www.youtube.com/watch?v=H9Blu0kWdZE
+# TODO: SQLAlchemy to SQLModel

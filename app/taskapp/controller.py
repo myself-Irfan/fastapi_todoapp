@@ -33,7 +33,6 @@ def get_task_service(db: DbSession) -> TaskService:
             "description": "Tasks retrieved successfully",
             "model": TaskListResponse
         },
-        404: {"description": "No task found"},
         500: {"description": "Internal server error"}
     }
 )
@@ -49,17 +48,12 @@ def get_all_tasks(task_service: TaskService = Depends(get_task_service)) -> Task
     try:
         tasks = task_service.fetch_tasks()
 
-        if not tasks:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail='No task found'
-            )
+        message = "Tasks retrieved successfully" if tasks else "No tasks found"
+
         return TaskListResponse(
-            message="Tasks retrieved successfully",
-            data=tasks
-            )
-    except HTTPException:
-        raise
+            message=message,
+            data=tasks or []
+        )
     except SQLAlchemyError as e:
         logger.error(f"Database error while fetching tasks: {e}", exc_info=True)
         raise HTTPException(
