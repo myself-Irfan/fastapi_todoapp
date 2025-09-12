@@ -5,6 +5,7 @@ from datetime import timedelta
 
 class Settings(BaseSettings):
     # Logging
+    log_level: str = Field()
     log_dir: Path = Field()
     log_file: str = Field()
 

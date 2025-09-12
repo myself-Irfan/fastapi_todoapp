@@ -9,7 +9,10 @@ from app.userapp.view import router as user_view_router
 from app.taskapp.task_views import router as task_view_router
 from app.database.core import engine, Base
 from app.validation_handler import ValidationErrorHandler
+from app.logger import configure_logger
 
+
+configure_logger()
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -39,9 +42,9 @@ app.include_router(task_api_router)
 app.include_router(task_view_router)
 
 # TODO: Need to finish
-# TODO: Change tasks JS to handle task not found 404
 # TODO: crontab like job reminding user to do their taskapp
 # TODO: add CI/CD
 # TODO: rate limiting
 # TODO: Clean architecture -> https://www.youtube.com/watch?v=H9Blu0kWdZE
 # TODO: SQLAlchemy to SQLModel
+# TODO: use structlog

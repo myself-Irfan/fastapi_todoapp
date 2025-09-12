@@ -1,3 +1,4 @@
+import structlog.contextvars
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.exc import SQLAlchemyError
@@ -42,6 +43,8 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: DbSessio
                 detail=f'User-{user_id} not found',
                 headers={'WWW-Authenticate': 'Bearer'}
             )
+
+        structlog.contextvars.bind_contextvars(user_id=user.id)
         return user
     except SQLAlchemyError as err:
         logger.error(f'Database error while fetching user: {err}')
