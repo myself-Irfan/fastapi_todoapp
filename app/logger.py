@@ -39,7 +39,7 @@ def configure_logger():
     structlog.configure(
         processors=[
             structlog.contextvars.merge_contextvars,
-            structlog.processors.TimeStamper(fmt="iso"),
+            structlog.processors.TimeStamper(fmt="iso", utc=False),
             structlog.stdlib.add_log_level,
             structlog.stdlib.add_logger_name,
             structlog.stdlib.PositionalArgumentsFormatter(),
@@ -50,7 +50,7 @@ def configure_logger():
         ],
         context_class=dict,
         logger_factory=structlog.stdlib.LoggerFactory(),
-        cache_logger_on_first_use=True
+        cache_logger_on_first_use=False
     )
 
 # ------------- LOGGER CREATION FUNCTION -------------

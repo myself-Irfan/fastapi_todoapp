@@ -43,11 +43,9 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: DbSessio
                 detail=f'User-{user_id} not found',
                 headers={'WWW-Authenticate': 'Bearer'}
             )
-
-        structlog.contextvars.bind_contextvars(user_id=user.id)
         return user
     except SQLAlchemyError as err:
-        logger.error(f'Database error while fetching user: {err}')
+        logger.error(f'Database error while fetching user', error=str(err), exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='Database error'

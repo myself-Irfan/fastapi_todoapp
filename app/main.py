@@ -3,6 +3,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
 
 from app.auth.controller import router as auth_api_router
+from app.middleware.logging_context import LoggingContextMiddleware
 from app.taskapp.controller import router as task_api_router
 from app.userapp.controller import router as user_api_router
 from app.userapp.view import router as user_view_router
@@ -22,6 +23,8 @@ def create_app() -> FastAPI:
         docs_url='/docs',
         redoc_url='/redoc'
     )
+
+    app.add_middleware(LoggingContextMiddleware)
 
     app.add_exception_handler(
         RequestValidationError,
@@ -47,4 +50,4 @@ app.include_router(task_view_router)
 # TODO: rate limiting
 # TODO: Clean architecture -> https://www.youtube.com/watch?v=H9Blu0kWdZE
 # TODO: SQLAlchemy to SQLModel
-# TODO: use structlog
+# TODO: use structlog -> bind user_id so it shows up in log
