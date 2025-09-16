@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const payload = this.getFormData();
 
             try {
-                const response = await apiClient.post('/tasks', payload);
+                const response = await apiClient.post('/tasks/', payload);
                 await apiClient.handleResponse(response);
 
                 UIUtils.showFeedback(

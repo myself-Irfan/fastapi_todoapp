@@ -67,8 +67,15 @@ class ApiClient {
             // if still 401 after refresh attempt or no refresh token, redirect to login
             if (response.status === 401) {
                 this.clearTokens();
-                window.location.href = '/login';
-                throw new Error('Unauthorized. Please log in again.');
+
+                const curPath = window.location.pathname;
+                if (curPath !== '/login') {
+                    window.location.href = '/login';
+                    throw new Error('Unauthorized. Please log in again.');
+                }
+                else {
+                    throw new Error('Invalid email or password.');
+                }
             }
 
             return response
@@ -97,13 +104,23 @@ class ApiClient {
                 return true;
             } else {
                 this.clearTokens();
-                window.location.href = '/login';
+
+                const curPath = window.location.pathname;
+                if (curPath !== '/login') {
+                    window.location.href = '/login';
+                }
+
                 return false;
             }
         } catch (err) {
             console.error('Token refresh failed', err);
             this.clearTokens();
-            window.location.href = '/login';
+
+            const curPath = window.location.pathname;
+            if (curPath !== '/login') {
+                window.location.href = '/login';
+            }
+
             return false;
         }
     }

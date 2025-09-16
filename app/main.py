@@ -43,9 +43,9 @@ app.include_router(user_view_router)
 app.include_router(task_api_router)
 app.include_router(task_view_router)
 
-# TODO: Need to add dockerfile and .yml then complete
+# TODO: use postgres
+# TODO: finish docker
 # TODO: crontab like job reminding user to do their taskapp
 # TODO: add CI/CD
-# TODO: rate limiting
 # TODO: Clean architecture -> https://www.youtube.com/watch?v=H9Blu0kWdZE
 # TODO: SQLAlchemy to SQLModel
