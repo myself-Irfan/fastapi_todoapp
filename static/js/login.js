@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // client side validation
         if (!validateForm(formData)) return;
 
+        UIUtils.setLoadingState('loginBtn', true, 'Signing in...')
+
         try {
             const response = await apiClient.post('/users/login', formData);
             const data = await apiClient.handleResponse(response);
@@ -36,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // handle different error types
             if (err.message.includes('detail')) {
                 try {
-                    const errorData = JSON.parse(error.message);
+                    const errorData = JSON.parse(err.message);
                     if (Array.isArray(errorData.detail)) {
                         UIUtils.handleServerValidation(errorData.detail);
                         return;
@@ -44,6 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch {}
             }
             UIUtils.showAlert(alertContainer, 'danger', err.message || 'Login failed.');
+        } finally {
+            UIUtils.setLoadingState('loginBtn', false)
         }
     });
 

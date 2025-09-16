@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
-
 from app.auth.controller import router as auth_api_router
 from app.middleware.logging_context import LoggingContextMiddleware
 from app.taskapp.controller import router as task_api_router

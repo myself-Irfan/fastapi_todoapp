@@ -1,0 +1,12 @@
+services:
+  web:
+    build:
+      context: .
+    container_name: fastapi_todoapp
+    env_file: .env
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+      - ./data:/app/data
+    ports:
+      - "8080:8080"
