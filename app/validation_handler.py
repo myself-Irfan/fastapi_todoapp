@@ -39,12 +39,15 @@ class ValidationErrorHandler:
     @staticmethod
     def _handle_value_error(field_name: str, error_msg: str) -> str:
         """Handle specific value errors with better messages"""
-        if 'email' in field_name.lower() or 'email' in error_msg.lower():
-            return f"Invalid email format for {field_name}"
-        elif 'password' in field_name.lower():
-            return f"Invalid password format for {field_name}"
+        field_name_str = str(field_name)
+        error_msg_str = str(error_msg)
+
+        if 'email' in field_name_str.lower() or 'email' in error_msg_str.lower():
+            return f"Invalid email format for {field_name_str}"
+        elif 'password' in field_name_str.lower():
+            return f"Invalid password format for {field_name_str}"
         else:
-            return f"Invalid value for {field_name}"
+            return f"Invalid value for {field_name_str}"
 
     @staticmethod
     async def handle_validation_error(request: Request, exc: Exception) -> JSONResponse:
