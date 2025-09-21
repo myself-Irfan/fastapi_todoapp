@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     db_port: int = Field()
     db_name: str = Field()
 
+    # api_limit
+    register_limit_per_hour: int = Field()
+
     @property
     def db_url(self) -> str:
         return f"postgresql+psycopg2://{self.db_user}:{self.db_pwd}@{self.db_host}:{self.db_port}/{self.db_name}"

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
 
 from app.auth.service import AuthenticationService
+from app.config import settings
 from app.userapp.model import UserRegister, UserLogin, ApiResponse, LoginResponse, LoginTokenData
 from app.database.core import DbSession
 from app.logger import get_logger
@@ -38,7 +39,7 @@ def get_user_service(db: DbSession) -> UserService:
         500: {'description': 'Internal server error'}
     }
 )
-@limiter.limit("5/hour")
+@limiter.limit(f"{settings.register_limit_per_hour}/hour")
 def register_user(request: Request, payload: UserRegister, user_service: UserService = Depends(get_user_service)) -> ApiResponse:
     logger.info(f'Received payload: {payload}')
 

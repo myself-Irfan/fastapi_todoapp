@@ -49,8 +49,8 @@ class TestTaskGet:
 
         response = client.get(self.task_url, headers=auth_headers)
 
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-        assert 'No task found' in response.json().get('detail')
+        assert response.status_code == status.HTTP_200_OK
+        assert 'No tasks found' in response.json().get('message')
 
     def test_get_all_tasks(self, client):
         """
