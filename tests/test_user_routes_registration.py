@@ -38,14 +38,14 @@ class TestUserRegistration:
         }
         response = client.post("/api/users/register", json=payload)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
         payload = {
             "email": "john.doe@example.com",
             "password": "securePassword123"
         }
         response = client.post("/api/users/register", json=payload)
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
         # Missing email
         payload = {
@@ -53,7 +53,7 @@ class TestUserRegistration:
             "password": "securePassword123"
         }
         response = client.post("/api/users/register", json=payload)
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
         # Missing password
         payload = {
@@ -61,7 +61,7 @@ class TestUserRegistration:
             "email": "john.doe@example.com"
         }
         response = client.post("/api/users/register", json=payload)
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     def test_registration_invalid_mail_fmt(self, client):
         invalid_mail_fmt = {
@@ -79,7 +79,7 @@ class TestUserRegistration:
                 "password": '12345'
             }
             response = client.post("/api/users/register", json=payload)
-            assert response.status_code == status.HTTP_400_BAD_REQUEST
+            assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     def test_registration_db_error(self, broken_db, client):
         """
@@ -112,10 +112,9 @@ class TestUserRegistration:
 
         response = client.post('/api/users/register', json=payload)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        response_data = response.json()
-
-        assert 'Field required' in response_data.get('detail')
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert "Validation error" in response.json().get("detail")
+        assert any('Field required' in err for err in response.json().get('errors'))
 
     def test_registration_long_field(self, client):
         """
@@ -131,5 +130,5 @@ class TestUserRegistration:
 
         response = client.post('/api/users/register', json=payload)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert 'name should have at most 100 characters' in response.json().get('detail')
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert any('name should have at most 100 characters' in err for err in response.json().get('errors'))

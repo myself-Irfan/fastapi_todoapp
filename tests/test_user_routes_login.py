@@ -71,8 +71,9 @@ class TestUserLogin:
         }
         response = client.post("/api/users/login", json=login_payload)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.json().get('detail') == 'password should have at least 5 characters'
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert "Validation error" in response.json().get("detail")
+        assert any('password should have at least 5 characters' in err for err in response.json().get("errors"))
 
     def test_user_login_missing_cred(self, client):
         reg_payload = {
@@ -87,16 +88,18 @@ class TestUserLogin:
         }
         response = client.post("/api/users/login", json=login_payload)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert 'Field required' in response.json().get('detail')
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert "Validation error" in response.json().get("detail")
+        assert any('Field required' in err for err in response.json().get('errors'))
 
         login_payload = {
             "email": "ahmed.1995.irfan@gmail.com"
         }
         response = client.post("/api/users/login", json=login_payload)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert 'Field required' in response.json().get('detail')
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert "Validation error" in response.json().get("detail")
+        assert any('Field required' in err for err in response.json().get('errors'))
 
     def test_user_login_invalid_fmt(self, client):
         reg_payload = {
@@ -120,7 +123,8 @@ class TestUserLogin:
                 "password": "12345"
             }
             response = client.post("/api/users/login", json=payload)
-            assert response.status_code == status.HTTP_400_BAD_REQUEST
+            assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+            assert "Validation error" in response.json().get("detail")
 
     def test_user_login_db_error(self, broken_db, client):
         reg_payload = {

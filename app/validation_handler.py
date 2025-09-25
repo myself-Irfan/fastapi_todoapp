@@ -1,7 +1,7 @@
 from fastapi import Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from typing import Dict, Any, Union, Awaitable
+from typing import Dict, Any, List
 
 
 class ValidationErrorHandler:
@@ -59,16 +59,12 @@ class ValidationErrorHandler:
                 content={"detail": "Validation error"}
             )
 
-        errors = exc.errors()
-
-        if len(errors) == 1:
-            # Single error - return as string
-            detail = ValidationErrorHandler.format_error_message(errors[0])
-        else:
-            # Multiple errors - return as array
-            detail = [ValidationErrorHandler.format_error_message(error) for error in errors]
+        errors: List[str] = [ValidationErrorHandler.format_error_message(err) for err in exc.errors()]
 
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"detail": detail}
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content={
+                "detail": "Validation error",
+                "errors": errors
+            }
         )

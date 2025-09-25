@@ -65,8 +65,9 @@ class TestTaskCreate:
         }
         response = client.post(self._task_url, headers=auth_headers, json=task_payload)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert 'Field required' in response.json().get('detail')
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert 'Validation error' in response.json().get('detail')
+        assert any("Field required" in err for err in response.json().get("errors"))
 
     def test_create_task_empty_title(self, client):
         """
@@ -84,8 +85,9 @@ class TestTaskCreate:
 
         response = client.post(self._task_url, headers=auth_headers, json=task_payload)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert 'Field required' in response.json().get('detail')
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert 'Validation error' in response.json().get('detail')
+        assert any("Field required" in err for err in response.json().get("errors"))
 
     def test_create_task_not_bool(self, client):
         """
@@ -103,8 +105,9 @@ class TestTaskCreate:
 
         response = client.post(self._task_url, headers=auth_headers, json=task_payload)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert 'Field required' in response.json().get('detail')
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert 'Validation error' in response.json().get('detail')
+        assert any("Field required" in err for err in response.json().get("errors"))
 
     def test_create_task_unauthorized(self, client):
         """
@@ -132,4 +135,5 @@ class TestTaskCreate:
         }
         response = client.post(self._task_url, headers=auth_headers, json=task_payload)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert "Validation error" in response.json().get("detail")

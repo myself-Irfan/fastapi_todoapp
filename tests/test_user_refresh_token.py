@@ -48,8 +48,9 @@ class TestUserRefreshToken:
 
         response = client.post('/api/auth/refresh-token')
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert 'Field required' in response.json().get('detail')
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        assert "Validation error" in response.json().get("detail")
+        assert any('Field required' in err for err in response.json().get('errors'))
 
     def test_refresh_token_invalid_token(self, client):
         self._initial_registration(client)

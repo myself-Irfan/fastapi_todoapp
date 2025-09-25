@@ -1,5 +1,5 @@
 services:
-  web:
+  fastapi_crud:
     build:
       context: .
     container_name: fastapi_todoapp
