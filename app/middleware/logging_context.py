@@ -7,6 +7,7 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 from starlette.responses import Response, StreamingResponse
 from starlette.types import ASGIApp
 
+from app.config import settings
 from app.auth.service import AuthenticationService
 from app.logger import get_logger
 
@@ -21,6 +22,7 @@ class LoggingContextMiddleware(BaseHTTPMiddleware):
 
     def __init__(self, app: ASGIApp):
         super().__init__(app)
+        self.masking_keys = settings.masking_keys
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         structlog.contextvars.clear_contextvars()
@@ -34,32 +36,36 @@ class LoggingContextMiddleware(BaseHTTPMiddleware):
         await self.__bind_user_context(request)
         await self.__bind_ip_context(request)
 
+        sanitized_req_headers = self.__sanitize(dict(request.headers))
         request_body = await self.__get_request_body(request)
+        sanitized_request = self.__sanitize(request_body)
 
         logger.info(
             "Request started",
-            payload=request_body,
-            headers=dict(request.headers),
+            payload=sanitized_request,
+            headers=sanitized_req_headers,
         )
 
         try:
             response = await call_next(request)
+            sanitized_res_headers = self.__sanitize(dict(response.headers))
 
             if isinstance(response, StreamingResponse) and not isinstance(response, Response):
                 logger.info(
                     "Request finished (streaming response)",
                     status_code=response.status_code,
-                    headers=dict(response.headers)
+                    headers=sanitized_res_headers
                 )
                 return response
 
             response_body = await self.__get_response(response)
+            sanitized_response = self.__sanitize(response_body)
 
             logger.info(
                 "Request finished",
-                payload=response_body,
+                payload=sanitized_response,
                 status_code=response.status_code,
-                headers=dict(response.headers),
+                headers=sanitized_res_headers,
             )
 
             return response
@@ -135,3 +141,13 @@ class LoggingContextMiddleware(BaseHTTPMiddleware):
                 return text
         except Exception:
             return None
+
+    def __sanitize(self, data: Any) -> Any:
+        if hasattr(data, "items"):
+            return {
+                k: ("***" if k.lower() in self.masking_keys else self.__sanitize(v))
+                for k, v in data.items()
+            }
+        elif isinstance(data, list):
+            return [self.__sanitize(item) for item in data]
+        return data

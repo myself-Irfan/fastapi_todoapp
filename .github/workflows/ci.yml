@@ -39,6 +39,7 @@ jobs:
       ACCESS_TOKEN_EXPIRE_MINUTES: 15
       REFRESH_TOKEN_EXPIRE_DAYS: 7
       REGISTER_LIMIT_PER_HOUR: 50
+      MASKING_KEYS: "password,token,authorization,api_key,secret"
 
     steps:
       - name: Checkout code

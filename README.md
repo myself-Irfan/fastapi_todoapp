@@ -7,7 +7,7 @@ A lightweight **FastAPI**-based Todo application
 - User registration & login with **JWT authentication**
 - Create, Read, Update and Delete tasks (CRUD)
 - **Rate-limiting** for registration
-- Structured logging
+- Structured logging with auto request response logging and sensitive data sanitization
 - Dockerized for local development & deployment
 - CI with automated tests
 

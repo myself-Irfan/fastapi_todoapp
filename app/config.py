@@ -1,5 +1,7 @@
+from typing import Set, Any
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field
+from pydantic import Field, field_validator
 from pathlib import Path
 from datetime import timedelta
 
@@ -24,6 +26,13 @@ class Settings(BaseSettings):
 
     # api_limit
     register_limit_per_hour: int = Field()
+
+    # masking fields
+    masking_keys: str = Field()
+
+    @property
+    def masking_keys_set(self) -> Set[str]:
+        return set(s.strip() for s in self.masking_keys.split("") if s.strip())
 
     @property
     def db_url(self) -> str:
