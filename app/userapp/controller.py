@@ -41,8 +41,6 @@ def get_user_service(db: DbSession) -> UserService:
 )
 @limiter.limit(f"{settings.register_limit_per_hour}/hour")
 def register_user(request: Request, payload: UserRegister, user_service: UserService = Depends(get_user_service)) -> ApiResponse:
-    logger.info(f'Received payload: {payload}')
-
     try:
         user = user_service.create_registered_user(payload)
 

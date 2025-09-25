@@ -110,7 +110,6 @@ class AuthenticationService:
             :param user_id: int
             :return: access_token -> str
             """
-        logger.info(f'Creating access token')
         return cls._create_jwt(
             user_id=user_id,
             expires_delta=timedelta(minutes=settings.access_token_expire_minutes),
@@ -124,7 +123,6 @@ class AuthenticationService:
             :param user_id: int
             :return: refresh_token -> str
             """
-        logger.info(f'Creating refresh token')
         return cls._create_jwt(
             user_id=user_id,
             expires_delta=timedelta(minutes=settings.refresh_token_expire_days),
