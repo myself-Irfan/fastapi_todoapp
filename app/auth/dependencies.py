@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from typing import Annotated
 
 from app.database.core import DbSession
-from app.userapp.entities import User
+from app.userapp.entities import DocumentUser
 from app.auth.service import AuthenticationService
 from app.logger import get_logger
 
@@ -12,7 +12,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/users/login')
 logger = get_logger(__name__)
 
 
-def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: DbSession) -> User:
+def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: DbSession) -> DocumentUser:
     """
     Get current user from JWT token
     :param token:
@@ -34,7 +34,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: DbSessio
                 headers={'WWW-Authenticate': 'Bearer'}
             )
 
-        user = db.get(User, user_id)
+        user = db.get(DocumentUser, user_id)
         if not user:
             logger.warning(f'User-{user_id} not found')
             raise HTTPException(
@@ -44,7 +44,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: DbSessio
             )
         return user
     except SQLAlchemyError as err:
-        logger.error(f'Database error while fetching user', error=str(err), exc_info=True)
+        logger.error('user retrival failed', error_type='database error', error=str(err), exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='Database error'
@@ -59,4 +59,4 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: DbSessio
         ) from err
 
 
-CurrentUser = Annotated[User, Depends(get_current_user)]
+CurrentUser = Annotated[DocumentUser, Depends(get_current_user)]

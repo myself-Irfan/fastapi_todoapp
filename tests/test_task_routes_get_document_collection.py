@@ -1,7 +1,7 @@
 from fastapi import status
 
 
-class TestTaskGet:
+class TestDocumentCollectionGet:
     """
     test cases for task-related endpoints
     """
@@ -30,11 +30,10 @@ class TestTaskGet:
 
         return {'Authorization': f'Bearer {access_token}'}
 
-    def _create_task(self, client, auth_headers):
+    def _create_document_collection(self, client, auth_headers):
         payload = {
-            "title": "Test Task",
-            "description": "Test Description",
-            "completed": False
+            "title": "Test document collection",
+            "description": "Test description"
         }
 
         client.post(self.task_url, headers=auth_headers, json=payload)
@@ -50,7 +49,7 @@ class TestTaskGet:
         response = client.get(self.task_url, headers=auth_headers)
 
         assert response.status_code == status.HTTP_200_OK
-        assert 'No tasks found' in response.json().get('message')
+        assert 'No collection found' in response.json().get('message')
 
     def test_get_all_tasks(self, client):
         """
@@ -59,12 +58,12 @@ class TestTaskGet:
         :return:
         """
         auth_headers = self._auth_headers(client)
-        self._create_task(client, auth_headers)
+        self._create_document_collection(client, auth_headers)
 
         response = client.get(self.task_url, headers=auth_headers)
 
         assert response.status_code == status.HTTP_200_OK
-        assert "Tasks retrieved successfully" in response.json().get('message')
+        assert "Collections retrieved successfully" in response.json().get('message')
         assert len(response.json().get('data')) > 0
 
     def test_all_tasks_unauthorized(self, client):
@@ -74,7 +73,7 @@ class TestTaskGet:
         :return:
         """
         auth_headers = self._auth_headers(client)
-        self._create_task(client, auth_headers)
+        self._create_document_collection(client, auth_headers)
 
         response = client.get(self.task_url, headers=None)
 
@@ -88,12 +87,12 @@ class TestTaskGet:
         :return:
         """
         auth_headers = self._auth_headers(client)
-        self._create_task(client, auth_headers)
+        self._create_document_collection(client, auth_headers)
 
         response = client.get(self.task_url + '/1', headers=auth_headers)
 
         assert response.status_code == status.HTTP_200_OK
-        assert "Task retrieved successfully" in response.json().get('message')
+        assert "Collection retrieved successfully" in response.json().get('message')
         assert "data" in response.json()
 
     def test_get_single_task_notfound(self, client):
@@ -116,7 +115,7 @@ class TestTaskGet:
         :return:
         """
         auth_headers = self._auth_headers(client)
-        self._create_task(client, auth_headers)
+        self._create_document_collection(client, auth_headers)
 
         response = client.get(self.task_url + '/1')
 

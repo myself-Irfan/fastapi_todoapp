@@ -2,7 +2,7 @@ from pydantic import EmailStr
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
 from sqlalchemy.orm import Session
 
-from app.userapp.entities import User
+from app.userapp.entities import DocumentUser
 from app.auth.service import AuthenticationService
 from app.logger import get_logger
 from app.userapp.model import UserRegister
@@ -17,7 +17,7 @@ class UserService:
     def __init__(self, db: Session):
         self.db = db
 
-    def __fetch_user_by_email(self, email: EmailStr) -> User | None:
+    def __fetch_user_by_email(self, email: EmailStr) -> DocumentUser | None:
         """
         Fetch user by email
         :param email: user email
@@ -26,7 +26,7 @@ class UserService:
         :raises SQLAlchemyError: if database operation fails
         """
         try:
-            user = self.db.query(User).filter(User.email == email).first() # type: ignore
+            user = self.db.query(DocumentUser).filter(DocumentUser.email == email).first() # type: ignore
             return user
         except SQLAlchemyError as db_err:
             logger.error("user retrieval failed", email=email, error=db_err, exc_info=True)
@@ -35,7 +35,7 @@ class UserService:
             logger.error("user retrieval failed", email=email, error=err, exc_info=True)
             raise
 
-    def create_registered_user(self, user_data: UserRegister) -> User | None:
+    def create_registered_user(self, user_data: UserRegister) -> DocumentUser | None:
         """
         Create a new user in the database
         """
@@ -48,7 +48,7 @@ class UserService:
         hashed_pwd = AuthenticationService.hash_pwd(user_data.password)
 
         try:
-            new_user = User(
+            new_user = DocumentUser(
                 name=user_data.name,
                 email=user_data.email,
                 hashed_pwd=hashed_pwd
@@ -69,7 +69,7 @@ class UserService:
             logger.error("user creation failed", error=err, exc_info=True)
             return None
 
-    def login_user(self, email: EmailStr, password: str) -> User | None:
+    def login_user(self, email: EmailStr, password: str) -> DocumentUser | None:
         """
         Authenticate user and return User object
         :param email: User email

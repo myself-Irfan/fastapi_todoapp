@@ -1,7 +1,7 @@
 from fastapi import status
 
 
-class TestTaskCreate:
+class TestDocumentCollectionCreate:
     """
     test case for create task
     """
@@ -30,16 +30,15 @@ class TestTaskCreate:
 
         return {'Authorization': f'Bearer {access_token}'}
 
-    def _create_task(self, client, auth_headers=None):
+    def _create_document_collection(self, client, auth_headers=None):
         payload = {
-            "title": "Test Task",
-            "description": "Test Description",
-            "completed": False
+            "title": "test document collection",
+            "description": "test Description",
         }
 
         return client.post(self._task_url, headers=auth_headers, json=payload)
 
-    def test_create_task(self, client):
+    def test_create_collection(self, client):
         """
         test creating task
         :param client:
@@ -47,12 +46,12 @@ class TestTaskCreate:
         """
         auth_headers = self._auth_headers(client)
 
-        response = self._create_task(client, auth_headers)
+        response = self._create_document_collection(client, auth_headers)
 
         assert response.status_code == status.HTTP_201_CREATED
         assert 'created successfully' in response.json().get('message')
 
-    def test_create_task_missing_field(self, client):
+    def test_create_collection_missing_field(self, client):
         """
         test create task with missing field
         :param client:
@@ -61,7 +60,7 @@ class TestTaskCreate:
         auth_headers = self._auth_headers(client)
 
         task_payload = {
-            "description": "Only description"
+            "description": "only description"
         }
         response = client.post(self._task_url, headers=auth_headers, json=task_payload)
 
@@ -69,7 +68,7 @@ class TestTaskCreate:
         assert 'Validation error' in response.json().get('detail')
         assert any("Field required" in err for err in response.json().get("errors"))
 
-    def test_create_task_empty_title(self, client):
+    def test_create_collection_empty_title(self, client):
         """
         test create task with empty title
         :param client:
@@ -80,27 +79,6 @@ class TestTaskCreate:
         task_payload = {
             "title": "",
             "description": "Test description",
-            "is_complete": True
-        }
-
-        response = client.post(self._task_url, headers=auth_headers, json=task_payload)
-
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        assert 'Validation error' in response.json().get('detail')
-        assert any("Field required" in err for err in response.json().get("errors"))
-
-    def test_create_task_not_bool(self, client):
-        """
-        test create task with empty title
-        :param client:
-        :return:
-        """
-        auth_headers = self._auth_headers(client)
-
-        task_payload = {
-            "title": "",
-            "description": "Test description",
-            "is_complete": "True"
         }
 
         response = client.post(self._task_url, headers=auth_headers, json=task_payload)
@@ -115,7 +93,7 @@ class TestTaskCreate:
         :param client:
         :return:
         """
-        response = self._create_task(client)
+        response = self._create_document_collection(client)
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
         assert 'Not authenticated' in response.json().get('detail')
@@ -130,8 +108,7 @@ class TestTaskCreate:
 
         task_payload = {
             "title": None,
-            "description": None,
-            "is_complete": None
+            "description": None
         }
         response = client.post(self._task_url, headers=auth_headers, json=task_payload)
 

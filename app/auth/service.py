@@ -7,7 +7,7 @@ from fastapi import HTTPException, status
 
 from app.config import settings
 from app.database.core import DbSession
-from app.userapp.entities import User
+from app.userapp.entities import DocumentUser
 from app.logger import get_logger
 
 _pwd_hasher = PasswordHasher(
@@ -214,7 +214,7 @@ class AuthenticationService:
             logger.error('Invalid refresh token')
             raise AuthenticationError('Invalid refresh token')
 
-        user = db.get(User, user_id)
+        user = db.get(DocumentUser, user_id)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

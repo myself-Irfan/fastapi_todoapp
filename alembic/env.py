@@ -4,6 +4,8 @@ from alembic import context
 
 from app.database.core import *
 from app.config import settings
+from app.userapp.entities import DocumentUser
+from app.taskapp.entities import DocumentCollection, DocumentCollectionFile
 
 # alembic config obj
 config = context.config
