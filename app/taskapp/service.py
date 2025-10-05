@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.logger import get_logger
-from app.taskapp.entities import Task
+from app.taskapp.entities import Document
 from app.taskapp.model import TaskRead, TaskCreate, TaskUpdate
 
 logger = get_logger(__name__)
@@ -24,7 +24,7 @@ class TaskService:
         :raises SQLAlchemyError: If database operation fails
         """
         try:
-            tasks = self.db.query(Task).all()
+            tasks = self.db.query(Document).all()
             logger.info(f'Fetched {len(tasks)} tasks from the database')
 
             return [TaskRead.model_validate(task) for task in tasks]
@@ -43,7 +43,7 @@ class TaskService:
         :raises SQLAlchemyError: If database operation fails
         """
         try:
-            task = self.db.get(Task, task_id)
+            task = self.db.get(Document, task_id)
 
             if not task:
                 logger.warning(f'Task with ID {task_id} not found')
@@ -68,7 +68,7 @@ class TaskService:
         logger.info(f'Creating new task with title: {task_data.title}')
 
         try:
-            new_task = Task(**task_data.model_dump())
+            new_task = Document(**task_data.model_dump())
             self.db.add(new_task)
             self.db.commit()
             self.db.refresh(new_task)
@@ -95,7 +95,7 @@ class TaskService:
         logger.info(f'Updating task with ID {task_id}')
 
         try:
-            task = self.db.get(Task, task_id)
+            task = self.db.get(Document, task_id)
 
             if not task:
                 logger.warning(f'Task with ID {task_id} not found')
@@ -126,7 +126,7 @@ class TaskService:
         logger.info(f'Deleting task with ID {task_id}')
 
         try:
-            task = self.db.get(Task, task_id)
+            task = self.db.get(Document, task_id)
 
             if not task:
                 logger.warning(f'Task with ID {task_id} not found')
