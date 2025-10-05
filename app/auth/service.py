@@ -7,7 +7,7 @@ from fastapi import HTTPException, status
 
 from app.config import settings
 from app.database.core import DbSession
-from app.entities.user import User
+from app.userapp.entities import User
 from app.logger import get_logger
 
 _pwd_hasher = PasswordHasher(

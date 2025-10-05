@@ -1,11 +1,10 @@
-import structlog.contextvars
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.exc import SQLAlchemyError
 from typing import Annotated
 
 from app.database.core import DbSession
-from app.entities.user import User
+from app.userapp.entities import User
 from app.auth.service import AuthenticationService
 from app.logger import get_logger
 

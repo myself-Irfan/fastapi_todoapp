@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.logger import get_logger
-from app.entities.task import Task
+from app.taskapp.entities import Task
 from app.taskapp.model import TaskRead, TaskCreate, TaskUpdate
 
 logger = get_logger(__name__)

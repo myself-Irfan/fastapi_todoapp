@@ -2,7 +2,7 @@ from pydantic import EmailStr
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
 from sqlalchemy.orm import Session
 
-from app.entities.user import User
+from app.userapp.entities import User
 from app.auth.service import AuthenticationService
 from app.logger import get_logger
 from app.userapp.model import UserRegister
@@ -29,10 +29,10 @@ class UserService:
             user = self.db.query(User).filter(User.email == email).first() # type: ignore
             return user
         except SQLAlchemyError as db_err:
-            logger.error(f'Database error while fetching user by email {email}: {db_err}')
+            logger.error("user retrieval failed", email=email, error=db_err, exc_info=True)
             raise
         except Exception as err:
-            logger.error(f'Unexpected error while fetching user by email {email}: {err}')
+            logger.error("user retrieval failed", email=email, error=err, exc_info=True)
             raise
 
     def create_registered_user(self, user_data: UserRegister) -> User | None:
@@ -42,7 +42,7 @@ class UserService:
         existing_user = self.__fetch_user_by_email(user_data.email)
 
         if existing_user:
-            logger.warning(f'User with email {user_data.email} already exists')
+            logger.warning("user already exists", email=user_data.email)
             return None
 
         hashed_pwd = AuthenticationService.hash_pwd(user_data.password)
@@ -58,15 +58,15 @@ class UserService:
             self.db.commit()
             self.db.refresh(new_user)
 
-            logger.info(f'User created with ID: {new_user.id}')
+            logger.info('user creation successful', user_id=new_user.id)
             return new_user
         except (OperationalError, SQLAlchemyError) as db_err:
             self.db.rollback()
-            logger.error(f'Database error during user creation: {db_err}')
+            logger.error("user creation failed", error=db_err, exc_info=True)
             return None
         except Exception as err:
             self.db.rollback()
-            logger.error(f'Unexpected error during user creation: {err}')
+            logger.error("user creation failed", error=err, exc_info=True)
             return None
 
     def login_user(self, email: EmailStr, password: str) -> User | None:
@@ -81,7 +81,7 @@ class UserService:
         user = self.__fetch_user_by_email(email)
 
         if not user:
-            logger.warning(f'User with email {email} not found')
+            logger.warning("user not registered", email=email)
             return None
 
         is_valid, needs_rehash = AuthenticationService.verify_pwd(
