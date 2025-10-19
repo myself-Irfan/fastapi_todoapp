@@ -1,6 +1,5 @@
 from io import BytesIO
 from fastapi import status
-import pytest
 
 
 class TestFileUpload:
