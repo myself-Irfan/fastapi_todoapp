@@ -48,6 +48,6 @@ app.include_router(file_api_router)
 
 # TODO: log request response to table
 # TODO: crontab to remind users for missed task
-# TODO: file hosting
-# TODO: Work on DocumentFile service + api
 # TODO: add pagination for get list APIs
+# TODO: add file count for doc_collection
+# TODO: file validation while uploading magic

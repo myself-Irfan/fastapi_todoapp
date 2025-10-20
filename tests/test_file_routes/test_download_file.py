@@ -248,3 +248,61 @@ class TestFileDownload:
             response = client.get(download_url, headers=auth_headers)
 
             assert response.status_code == status.HTTP_200_OK
+
+    def test_download_multiple_times_same_file(self, client):
+        auth_headers = self._auth_headers(client)
+
+        upload_response = self._upload_file(
+            client, auth_headers,
+            "multi_download.txt",
+            b"download multiple times"
+        )
+
+        message = upload_response.json().get("message")
+        file_id = int(message.split("file-")[1].split(" ")[0])
+        download_url = self._download_url.format(file_id=file_id)
+
+        for _ in range(5):
+            response = client.get(download_url, headers=auth_headers)
+            assert response.status_code == status.HTTP_200_OK
+            assert response.content == b"download multiple times"
+
+    def test_download_file_headers_content_type(self, client):
+        auth_headers = self._auth_headers(client)
+
+        test_cases = [
+            ("text.txt", "text/plain"),
+            ("doc.pdf", "application/pdf"),
+            ("img.jpg", "image/jpeg"),
+            ("sheet.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+            ("archive.zip", "application/zip"),
+        ]
+
+        for filename, expected_mime in test_cases:
+            upload_response = self._upload_file(
+                client, auth_headers, filename, b"test", mime_type=expected_mime
+            )
+
+            message = upload_response.json().get("message")
+            file_id = int(message.split("file-")[1].split(" ")[0])
+            download_url = self._download_url.format(file_id=file_id)
+
+            response = client.get(download_url, headers=auth_headers)
+            assert response.status_code == status.HTTP_200_OK
+            assert expected_mime in response.headers.get("content-type")
+
+    def test_download_file_content_disposition_attachment(self, client):
+        auth_headers = self._auth_headers(client)
+
+        upload_response = self._upload_file(
+            client, auth_headers, filename="download_test.txt", content=b"test"
+        )
+
+        message = upload_response.json().get("message")
+        file_id = int(message.split("file-")[1].split(" ")[0])
+        download_url = self._download_url.format(file_id=file_id)
+
+        response = client.get(download_url, headers=auth_headers)
+        assert response.status_code == status.HTTP_200_OK
+        content_disposition = response.headers.get("content-disposition", "")
+        assert "attachment", "download_test.txt" in content_disposition
