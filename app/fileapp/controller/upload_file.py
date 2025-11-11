@@ -1,10 +1,12 @@
-from fastapi import status, UploadFile, File, Form, HTTPException, APIRouter
-from sqlalchemy.exc import SQLAlchemyError
+from fastapi import status, UploadFile, File, Form, APIRouter, HTTPException
 from typing import Optional
 
+from sqlalchemy.exc import SQLAlchemyError
+
 from app.auth.dependencies import CurrentUser
-from app.taskapp.file_model import FileReadResponse
-from app.taskapp.dependencies import DependsFileService
+from app.fileapp.exceptions import FileUploadException
+from app.fileapp.model import FileReadResponse
+from app.fileapp.dependencies import DependsFileUploadService
 from app.logger import get_logger
 
 router = APIRouter()
@@ -24,14 +26,15 @@ logger = get_logger(__name__)
             "model": FileReadResponse
         },
         400: {"description": "invalid file or parameters"},
+        404: {"description": "document not found"},
         500: {"description": "internal server error"}
     }
 )
-async def upload_file(
-        current_user: CurrentUser,
-        file_service: DependsFileService,
-        file: UploadFile = File(...),
-        document_id: Optional[int] = Form(None, description="document id to link file with"),
+def upload_file(
+    current_user: CurrentUser,
+    file_upload_service: DependsFileUploadService,
+    file: UploadFile = File(...),
+    document_id: Optional[int] = Form(None, description="document id to link file with"),
 ) -> FileReadResponse:
     logger.info(
         "file upload request received",
@@ -40,38 +43,35 @@ async def upload_file(
         document_id=document_id
     )
 
-    try:
-        if not file.filename:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="no filename provided"
-            )
+    if not file.filename:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="no filename provided"
+        )
 
-        file_id = await file_service.upload_file(
+    try:
+        file_upload_service.upload_file(
             file=file,
             user_id=current_user.id,
             document_id=document_id
         )
+        return FileReadResponse(message="file upload successful")
 
-        return FileReadResponse(
-            message=f"file-{file_id} upload successful"
-        )
-
-    except ValueError as val_err:
-        logger.warning("invalid file upload", error=str(val_err))
+    except FileUploadException as e:
+        logger.error("file upload error", error=str(e), status_code=e.status_code)
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(val_err)
+            status_code=e.status_code,
+            detail=e.message
         )
     except SQLAlchemyError as sql_err:
-        logger.error("file upload failed", error_type="database error", error=sql_err, exc_info=True)
+        logger.error("database error", error=sql_err, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="unexpected error occurred"
-        ) from sql_err
+            detail="database error occurred"
+        )
     except Exception as err:
-        logger.error("file upload failed", error_type="unexpected error", error=err, exc_info=True)
+        logger.error("unexpected error", error=err, exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="unexpected error occurred"
-        ) from err
+        )

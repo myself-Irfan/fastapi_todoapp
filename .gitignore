@@ -1,8 +1,45 @@
+# Python virtual environment
 .venv/
+env/
+venv/
+
+# Byte-compiled / optimized / cache files
 __pycache__/
+*.py[cod]
+*$py.class
+
+# IDE / Editor directories
 .idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Database files
 *.db
+*.sqlite3
+
+# Logs
 logs/
+*.log
+
+# Environment variables
 .env
-.DS_Strore
+
+# Uploads / media files
 uploads/
+static/uploads/
+
+# Coverage reports
+.coverage
+htmlcov/
+coverage.xml
+
+# Pytest cache
+.pytest_cache/
+
+# Docker / container files
+docker-compose.override.yml

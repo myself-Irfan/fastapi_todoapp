@@ -14,32 +14,43 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_db
+          POSTGRES_USER: ci_user
+          POSTGRES_PASSWORD: ci_password
+          POSTGRES_DB: ci_test_db
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U postgres"
+          --health-cmd="pg_isready -U ci_user"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
 
     env:
-      DB_USER: postgres
-      DB_PWD: postgres
-      DB_NAME: test_db
+      # Database
+      DB_USER: ci_user
+      DB_PWD: ci_password
+      DB_NAME: ci_test_db
       DB_HOST: localhost
       DB_PORT: 5432
+
+      # Logging
       LOG_LEVEL: info
       LOG_DIR: logs
-      LOG_FILE: todolist.log
+      LOG_FILE: fileservice.log
+      MASKING_KEYS: password,token,authorization,api_key,secret
+
+      # JWT
       SECRET_KEY: my-secret-key
       ALGORITHM: HS256
       ACCESS_TOKEN_EXPIRE_MINUTES: 15
       REFRESH_TOKEN_EXPIRE_DAYS: 7
+
+      # Rate limiting
       REGISTER_LIMIT_PER_HOUR: 100
-      MASKING_KEYS: "password,token,authorization,api_key,secret"
+
+      # Uploads
+      UPLOAD_DIR: uploads
+      ALLOWED_FILE_TYPES: .pdf,.png,.jpg,.txt,.csv
 
     steps:
       - name: Checkout code
@@ -51,9 +62,10 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: | 
-          python -m pip install --upgrade pip 
+        run: |
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tests
-        run: pytest
+      - name: Run tests with coverage
+        run: |
+          pytest --cov=app --cov-report=term-missing --cov-report=xml --cov-report=html -v

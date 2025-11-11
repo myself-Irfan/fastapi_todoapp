@@ -2,7 +2,7 @@ from fastapi import status, APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
 from app.auth.dependencies import CurrentUser
-from app.taskapp.dependencies import DependsFileService
+from app.fileapp.dependencies import DependsFileDownloadService
 from app.logger import get_logger
 
 router = APIRouter()
@@ -19,26 +19,15 @@ logger = get_logger(__name__)
         500: {"description": "internal server error"}
     }
 )
-async def download_file(file_id: int, current_user: CurrentUser, file_service: DependsFileService) -> FileResponse:
+async def download_file(file_id: int, current_user: CurrentUser, file_download_service: DependsFileDownloadService) -> FileResponse:
 
     try:
-        file_metadata = file_service.fetch_file_by_id(
+        file = file_download_service.get_file_path(
             user_id=current_user.id,
             file_id=file_id
         )
 
-        if not file_metadata:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"file-{file_id} not found"
-            )
-
-        file_path = file_service.get_file_path(
-            user_id=current_user.id,
-            file_id=file_id
-        )
-
-        if not file_path:
+        if not file:
             logger.error("physical file not found", file_id=file_id)
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -46,9 +35,9 @@ async def download_file(file_id: int, current_user: CurrentUser, file_service: D
             )
 
         return FileResponse(
-            path=file_path,
-            filename=file_metadata.title,
-            media_type=file_metadata.mime_type
+            path=file.file_path,
+            filename=file.title,
+            media_type=file.mime_type
         )
     except HTTPException:
         raise

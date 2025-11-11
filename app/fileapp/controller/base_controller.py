@@ -3,12 +3,12 @@ from sqlalchemy.exc import SQLAlchemyError
 from typing import Optional
 
 from app.auth.dependencies import CurrentUser, get_current_user
-from app.taskapp.file_model import FileReadResponse, FileListResponse, ApiResponse
+from app.fileapp.model import FileReadResponse, FileListResponse, ApiResponse
 from app.logger import get_logger
-from app.taskapp.file_service import FileService
-from app.taskapp.controller.upload_file import router as upload_router
-from app.taskapp.controller.download_file import router as download_router
-from app.taskapp.dependencies import get_file_service
+from app.fileapp.services.base_service import FileService
+from app.fileapp.controller.upload_file import router as upload_router
+from app.fileapp.controller.download_file import router as download_router
+from app.fileapp.dependencies import get_file_service
 
 router = APIRouter(
     prefix="/api/files",

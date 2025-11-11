@@ -6,6 +6,8 @@ from app.userapp.entities import DocumentUser
 from app.auth.service import AuthenticationService
 from app.logger import get_logger
 from app.userapp.model import UserRegister
+from app.userapp.exceptions import DatabaseOperationException, UserDuplicateException, UserCreationException, \
+    InvalidCredentialsException, UserNotFoundException
 
 logger = get_logger(__name__)
 
@@ -18,24 +20,18 @@ class UserService:
         self.db = db
 
     def __fetch_user_by_email(self, email: EmailStr) -> DocumentUser | None:
-        """
-        Fetch user by email
-        :param email: user email
-        :param db: database session
-        :return: User object or None if not found
-        :raises SQLAlchemyError: if database operation fails
-        """
         try:
-            user = self.db.query(DocumentUser).filter(DocumentUser.email == email).first() # type: ignore
-            return user
-        except SQLAlchemyError as db_err:
+            user = self.db.query(DocumentUser).filter_by(email=email).first()
+        except (SQLAlchemyError, OperationalError) as db_err:
             logger.error("user retrieval failed", email=email, error=db_err, exc_info=True)
-            raise
-        except Exception as err:
-            logger.error("user retrieval failed", email=email, error=err, exc_info=True)
-            raise
+            raise DatabaseOperationException(f"Failed to fetch user: {db_err}")
+        else:
+            return user
 
-    def create_registered_user(self, user_data: UserRegister) -> DocumentUser | None:
+    def __get_login_data(self, user_id: int) -> tuple[str, str]:
+        return AuthenticationService.generate_access_token(user_id), AuthenticationService.generate_refresh_token(user_id)
+
+    def create_registered_user(self, user_data: UserRegister) -> DocumentUser:
         """
         Create a new user in the database
         """
@@ -43,7 +39,7 @@ class UserService:
 
         if existing_user:
             logger.warning("user already exists", email=user_data.email)
-            return None
+            raise UserDuplicateException(f'user with email-{user_data.email} already exists')
 
         hashed_pwd = AuthenticationService.hash_pwd(user_data.password)
 
@@ -63,26 +59,14 @@ class UserService:
         except (OperationalError, SQLAlchemyError) as db_err:
             self.db.rollback()
             logger.error("user creation failed", error=db_err, exc_info=True)
-            return None
-        except Exception as err:
-            self.db.rollback()
-            logger.error("user creation failed", error=err, exc_info=True)
-            return None
+            raise UserCreationException(f"Database error during user creation: {str(db_err)}") from db_err
 
-    def login_user(self, email: EmailStr, password: str) -> DocumentUser | None:
-        """
-        Authenticate user and return User object
-        :param email: User email
-        :param password: User password
-        :return: Authenticated User object
-        :raises ValueError: If credentials are invalid
-        :raises SQLAlchemyError: If database operation fails
-        """
-        user = self.__fetch_user_by_email(email)
+    def login_user(self, email: EmailStr, password: str) -> tuple[str, str]:
+        user: DocumentUser = self.__fetch_user_by_email(email)
 
         if not user:
             logger.warning("user not registered", email=email)
-            return None
+            raise InvalidCredentialsException(f"user-{email} not registered")
 
         is_valid, needs_rehash = AuthenticationService.verify_pwd(
             user.hashed_pwd,
@@ -90,7 +74,7 @@ class UserService:
         )
         if not is_valid:
             logger.warning(f'Invalid login attempt for user {email}')
-            return None
+            raise InvalidCredentialsException("invalid credentials")
 
         if needs_rehash:
             logger.info(f"Rehashing password for user {user.id}")
@@ -98,4 +82,4 @@ class UserService:
             self.db.commit()
             self.db.refresh(user)
 
-        return user
+        return self.__get_login_data(user.id)

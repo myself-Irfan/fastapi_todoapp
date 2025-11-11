@@ -5,10 +5,10 @@ from fastapi.staticfiles import StaticFiles
 from app.auth.controller import router as auth_api_router
 from app.middleware.logging_context import LoggingContextMiddleware
 from app.taskapp.document_controller import router as task_api_router
-from app.userapp.controller import router as user_api_router
+from app.userapp.routers import router as user_api_router
 from app.userapp.view import router as user_view_router
 from app.taskapp.task_views import router as task_view_router
-from app.taskapp.file_controller import  router as file_api_router
+from app.fileapp.controller.base_controller import router as file_api_router
 from app.database.core import engine, Base
 from app.validation_handler import ValidationErrorHandler
 from app.logger import configure_logger
@@ -50,4 +50,4 @@ app.include_router(file_api_router)
 # TODO: crontab to remind users for missed task
 # TODO: add pagination for get list APIs
 # TODO: add file count for doc_collection
-# TODO: file validation while uploading magic
+# TODO: update test to register class-wise and cleanup instead of test-wise | rewrite whole test
