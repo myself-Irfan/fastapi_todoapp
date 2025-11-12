@@ -5,8 +5,9 @@ from fastapi import status
 @pytest.mark.integration
 @pytest.mark.userapp
 class TestRegisterRoute:
-    def __init__(self):
-        self._register_url = '/register'
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self._register_url = 'api/users/register'
 
     def test_register_success(self, client, valid_user_data, disable_rate_limiter, mock_auth_service):
         response = client.post(self._register_url, json=valid_user_data)
@@ -15,24 +16,25 @@ class TestRegisterRoute:
         assert "message" in response.json()
         assert 'created successfully' in response.json()['message'].lower()
 
-    def test_register_duplicate_email(self, client, get_default_test_user, disable_rate_limiter, mock_auth_service):
+    def test_register_duplicate_email(self, client, valid_user_data, disable_rate_limiter, mock_auth_service):
+        client.post(self._register_url, json=valid_user_data)
 
         duplicate_data = {
             "name": "New User",
-            'email': get_default_test_user.email,
+            'email': valid_user_data.get('email'),
             'password': "newpwd123"
         }
 
         response = client.post(self._register_url, json=duplicate_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert 'already exists' in response.json().data['detail'].lower()
+        assert 'already exists' in response.json().get('detail').lower()
 
-    def test_register_invalid_email(self, client, disable_rate_limiter):
+    def test_register_invalid_email(self, client, invalid_user_data_bad_email, disable_rate_limiter):
         invalid_data = {
-            'name': 'Test User',
-            'email': 'not-an-email',
-            'password': 'pwd123'
+            'name': invalid_user_data_bad_email.get('name'),
+            'email': invalid_user_data_bad_email.get('email'),
+            'password': invalid_user_data_bad_email.get('password')
         }
 
         response = client.post(self._register_url, json=invalid_data)

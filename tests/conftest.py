@@ -35,9 +35,6 @@ def db_engine():
 
 @pytest.fixture(scope='function')
 def db_session(db_engine) -> Generator[Session, None, None]:
-    """
-    provide a new session for each test function with auto rollback for test isolation
-    """
     session_local = sessionmaker(autocommit=False, autoflush=False, bind=db_engine)
     session = session_local()
 
