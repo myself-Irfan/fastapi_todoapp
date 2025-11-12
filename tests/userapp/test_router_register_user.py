@@ -70,13 +70,12 @@ class TestRegisterRoute:
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
-    def test_register_special_chars_in_name(self, client, disable_rate_limiter, mock_auth_service):
+    def test_register_special_chars_in_name(self, client, valid_user_data, disable_rate_limiter, mock_auth_service):
         data = {
             'name': 'Test User @#$',
-            'email': 'test@example.com',
-            'password': 'password123'
+            'email': valid_user_data.get('email'),
+            'password': valid_user_data.get('password')
         }
 
         response = client.post(self._register_url, json=data)
-
         assert response.status_code == status.HTTP_201_CREATED

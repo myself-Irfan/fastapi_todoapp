@@ -1,10 +1,12 @@
 import pytest
 from faker import Faker
 from datetime import datetime
+from sqlalchemy.orm import Session
 
 from app.userapp.entities import DocumentUser
 from app.userapp.service import UserService
-from app.userapp.model import UserRegister, UserLogin
+from app.userapp.model import UserRegister
+
 
 fake = Faker()
 
@@ -27,13 +29,6 @@ def valid_user_data():
 @pytest.fixture
 def valid_user_register(valid_user_data):
     return UserRegister(**valid_user_data)
-
-@pytest.fixture
-def valid_user_login():
-    return UserLogin(
-        email=fake.email(),
-        password=fake.password(length=10)
-    )
 
 @pytest.fixture
 def sample_user_entity():
@@ -97,45 +92,22 @@ def invalid_user_data_short_password():
     }
 
 @pytest.fixture
-def invalid_user_data_missing_fields():
-    return {
-        "name": "Valid Name"
-    }
-
-@pytest.fixture
-def register_payload(valid_user_data):
-    return valid_user_data
-
-@pytest.fixture
 def login_payload():
     return {
         "email": "test@example.com",
         "password": "testpassword123"
     }
 
-@pytest.fixture
-def make_test_user(db_session):
-    def _create_user(**kwargs):
-        default_data = {
-            "name": fake.name(),
-            "email": fake.email(),
-            "hashed_pwd": "hashed_password_123",
-            "created_at": datetime.utcnow()
-        }
-        default_data.update(kwargs)
+@pytest.fixture(scope='session')
+def make_test_user(db_engine):
+    with Session(bind=db_engine) as session:
+        user = DocumentUser(
+            name="Test User",
+            email="test@example.com",
+            hashed_pwd='hashed_pwd_123'
+        )
+        session.add(user)
+        session.commit()
+        session.refresh(user)
 
-        user = DocumentUser(**default_data)
-        db_session.add(user)
-        db_session.commit()
-        db_session.refresh(user)
-        return user
-
-    return _create_user
-
-@pytest.fixture
-def get_default_test_user(make_test_user):
-    return make_test_user(
-        name='test user',
-        email='test@example.com',
-        hashed_pwd="hashed_password_123",
-    )
+    return user
