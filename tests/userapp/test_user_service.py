@@ -74,7 +74,7 @@ class TestUserServiceLogin:
     def test_login_user_not_found(self, mock_user_service):
         mock_user_service.db.query.return_value.filter_by.return_value.first.return_value = None
 
-        with pytest.raises(InvalidCredentialsException):
+        with pytest.raises(UserNotFoundException):
             mock_user_service.login_user('nonexistant@example.com', 'password')
 
     def test_login_invalid_password(self, mock_user_service, mock_auth_service, sample_user_entity):

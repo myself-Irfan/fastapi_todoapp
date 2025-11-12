@@ -66,7 +66,7 @@ class UserService:
 
         if not user:
             logger.warning("user not registered", email=email)
-            raise InvalidCredentialsException(f"user-{email} not registered")
+            raise UserNotFoundException(f"user-{email} not registered")
 
         is_valid, needs_rehash = AuthenticationService.verify_pwd(
             user.hashed_pwd,
