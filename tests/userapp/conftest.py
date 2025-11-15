@@ -31,41 +31,15 @@ def valid_user_register(valid_user_data):
     return UserRegister(**valid_user_data)
 
 @pytest.fixture
-def sample_user_entity():
+def sample_user_entity(valid_user_data):
     return DocumentUser(
         id=1,
-        name=fake.name(),
-        email=fake.email(),
+        name=valid_user_data['name'],
+        email=valid_user_data['email'],
         hashed_pwd='hashed_password_123',
         created_at=datetime.now(),
         updated_at=None
     )
-
-@pytest.fixture
-def multiple_users(db_session):
-    users = []
-    for i in range(3):
-        user = DocumentUser(
-            name=f"User {i}",
-            email=f"user{i}@example.com",
-            hashed_pwd=f"hashed_password_{i}",
-            created_at=datetime.utcnow()
-        )
-        db_session.add(user)
-        users.append(user)
-
-    db_session.commit()
-    db_session.refresh(user for user in users)
-
-    return users
-
-@pytest.fixture
-def invalid_user_data_short_name():
-    return {
-        'name': 'Ab',
-        'email': fake.email(),
-        'password': 'validpass123'
-    }
 
 @pytest.fixture
 def invalid_user_data_long_name():
@@ -92,7 +66,7 @@ def invalid_user_data_short_password():
     }
 
 @pytest.fixture
-def login_payload():
+def login_payload(valid_user_data):
     return {
         "email": "test@example.com",
         "password": "testpassword123"

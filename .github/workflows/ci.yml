@@ -46,7 +46,7 @@ jobs:
       REFRESH_TOKEN_EXPIRE_DAYS: 7
 
       # Rate limiting
-      REGISTER_LIMIT_PER_HOUR: 100
+      REGISTER_LIMIT_PER_HOUR: 10
 
       # Uploads
       UPLOAD_DIR: uploads

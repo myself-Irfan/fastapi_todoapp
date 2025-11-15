@@ -95,13 +95,19 @@ def mock_auth_service(mocker):
     return auth_mock
 
 @pytest.fixture
-def disable_rate_limiter(mocker):
-    """
-    disable rate limiting for tests
-    """
-    mock_limiter = mocker.patch('app.rate_limiter.limiter.limit')
-    mock_limiter.return_value = lambda func: func
-    return mock_limiter
+def disable_rate_limiter():
+    """Reset rate limiter counters before the test."""
+    from app.rate_limiter import limiter
+
+    # Clear the internal dict of MemoryStorage
+    if hasattr(limiter._storage, "storage"):  # MemoryStorage has 'storage' dict
+        limiter._storage.storage.clear()
+    elif hasattr(limiter._storage, "_storage"):  # older versions
+        limiter._storage._storage.clear()
+    else:
+        raise RuntimeError("Cannot clear SlowAPI storage; storage attribute not found")
+
+    yield
 
 @pytest.fixture
 def mock_logger(mocker):

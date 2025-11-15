@@ -41,8 +41,10 @@ class TestRegisterRoute:
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
-    def test_register_short_name(self, client, invalid_user_data_short_name, disable_rate_limiter):
-        response = client.post(self._register_url, json=invalid_user_data_short_name)
+    def test_register_short_name(self, client, valid_user_data, disable_rate_limiter):
+        valid_user_data['name'] = valid_user_data['name'][:2]
+
+        response = client.post(self._register_url, json=valid_user_data)
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
@@ -79,3 +81,34 @@ class TestRegisterRoute:
 
         response = client.post(self._register_url, json=data)
         assert response.status_code == status.HTTP_201_CREATED
+
+@pytest.mark.integration
+@pytest.mark.userapp
+class TestRateLimiting:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self._register_url = 'api/users/register'
+
+    @pytest.mark.slow
+    def test_register_rate_limit(self, client, mock_auth_service):
+        success_count = 0
+        rate_limited = False
+
+        for i in range(11):
+            data = {
+                "name": f"User {i}",
+                "email": f"user{i}@example.com",
+                "password": "password123",
+            }
+            response = client.post(self._register_url, json=data)
+
+            if response.status_code == status.HTTP_201_CREATED:
+                success_count += 1
+            elif response.status_code == status.HTTP_429_TOO_MANY_REQUESTS:
+                rate_limited = True
+                break
+            else:
+                pytest.fail(f"Unexpected response: {response.status_code}, {response.text}")
+
+        assert success_count <= 10
+        assert rate_limited or success_count == 10
